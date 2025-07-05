@@ -11,6 +11,12 @@ interface ChatInterfaceProps {
   onJumpToTime?: (time: number) => void;
 }
 
+const statusMessages = [
+  { text: "Processing your question...", icon: Brain, duration: 800 },
+  { text: "Searching knowledge base...", icon: Search, duration: 600 },
+  { text: "Analyzing video content...", icon: Zap, duration: 700 },
+  { text: "Generating response...", icon: Brain, duration: 500 }
+];
 const ChatInterface: React.FC<ChatInterfaceProps> = ({
   messages,
   onSendMessage,
@@ -20,6 +26,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 }) => {
   const [inputMessage, setInputMessage] = useState('');
   const [isRecording, setIsRecording] = useState(false);
+  const [currentStatus, setCurrentStatus] = useState<{ text: string; icon: any } | null>(null);
+  const [statusIndex, setStatusIndex] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -27,6 +35,39 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     scrollToBottom();
   }, [messages]);
 
+  // Handle status progression when loading
+  useEffect(() => {
+    if (isLoading) {
+      setStatusIndex(0);
+      setCurrentStatus(statusMessages[0]);
+      
+      const progressStatus = () => {
+        let currentIndex = 0;
+        
+        const showNextStatus = () => {
+          if (currentIndex < statusMessages.length && isLoading) {
+            const status = statusMessages[currentIndex];
+            setCurrentStatus(status);
+            setStatusIndex(currentIndex);
+            
+            setTimeout(() => {
+              currentIndex++;
+              if (currentIndex < statusMessages.length) {
+                showNextStatus();
+              }
+            }, status.duration);
+          }
+        };
+        
+        showNextStatus();
+      };
+      
+      progressStatus();
+    } else {
+      setCurrentStatus(null);
+      setStatusIndex(0);
+    }
+  }, [isLoading]);
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -131,23 +172,69 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           ))}
         </AnimatePresence>
 
-        {/* Loading Message */}
-        {isLoading && (
+        {/* Enhanced Loading with Status Messages */}
+        {isLoading && currentStatus && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
             className="flex justify-start"
           >
-            <div className="bg-white rounded-lg px-4 py-3 shadow-sm border border-gray-200">
-              <div className="flex items-center space-x-2">
-                <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" />
-                  <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
-                  <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+            <motion.div 
+              className="bg-white rounded-lg px-4 py-3 shadow-sm border border-gray-200 max-w-sm"
+              key={statusIndex}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 10 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="flex items-center space-x-3">
+                {/* Animated Status Icon */}
+                <motion.div
+                  className="flex-shrink-0"
+                  animate={{ 
+                    rotate: [0, 360],
+                    scale: [1, 1.1, 1]
+                  }}
+                  transition={{ 
+                    rotate: { duration: 2, repeat: Infinity, ease: "linear" },
+                    scale: { duration: 1, repeat: Infinity, ease: "easeInOut" }
+                  }}
+                >
+                  <currentStatus.icon className="w-4 h-4 text-blue-600" />
+                </motion.div>
+                
+                {/* Status Text with Typing Effect */}
+                <motion.span 
+                  className="text-sm text-gray-600 font-medium"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {currentStatus.text}
+                </motion.span>
+                
+                {/* Subtle Progress Dots */}
+                <div className="flex space-x-1 ml-auto">
+                  {[...Array(3)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className="w-1.5 h-1.5 bg-blue-400 rounded-full"
+                      animate={{
+                        scale: [1, 1.3, 1],
+                        opacity: [0.4, 1, 0.4],
+                      }}
+                      transition={{
+                        duration: 0.8,
+                        repeat: Infinity,
+                        delay: i * 0.2,
+                        ease: "easeInOut"
+                      }}
+                    />
+                  ))}
                 </div>
-                <span className="text-sm text-gray-500">AI is thinking...</span>
               </div>
-            </div>
+            </motion.div>
           </motion.div>
         )}
 
