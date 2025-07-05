@@ -2,11 +2,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Mic, ThumbsUp, ThumbsDown, Clock, Brain, Search, Zap } from 'lucide-react';
 import { ChatMessage } from '../types';
+import FeedbackModal from './FeedbackModal';
 
 interface ChatInterfaceProps {
   messages: ChatMessage[];
   onSendMessage: (message: string) => void;
-  onFeedback: (messageId: string, feedback: 'like' | 'dislike') => void;
+  onFeedback: (messageId: string, feedback: 'like' | 'dislike', feedbackText?: string, category?: string) => void;
   isLoading?: boolean;
   onJumpToTime?: (time: number) => void;
 }
@@ -28,6 +29,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [isRecording, setIsRecording] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<{ text: string; icon: any } | null>(null);
   const [statusIndex, setStatusIndex] = useState(0);
+  const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
+  const [selectedMessageId, setSelectedMessageId] = useState<string>('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -83,6 +86,17 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const handleVoiceRecord = () => {
     setIsRecording(!isRecording);
     // Voice recording logic would go here
+  };
+
+  const handleThumbsDown = (messageId: string) => {
+    setSelectedMessageId(messageId);
+    setFeedbackModalOpen(true);
+  };
+
+  const handleFeedbackSubmit = (feedbackText: string, category: string) => {
+    onFeedback(selectedMessageId, 'dislike', feedbackText, category);
+    setFeedbackModalOpen(false);
+    setSelectedMessageId('');
   };
 
   const formatTimestamp = (date: Date) => {
@@ -152,7 +166,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                         <ThumbsUp className="w-3 h-3" />
                       </button>
                       <button
-                        onClick={() => onFeedback(message.id, 'dislike')}
+                        onClick={() => handleThumbsDown(message.id)}
                         className={`p-1 rounded transition-colors duration-200 ${
                           message.feedback === 'dislike'
                             ? 'text-red-600 bg-red-50'
@@ -276,6 +290,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           </button>
         </div>
       </form>
+
+      {/* Feedback Modal */}
+      <FeedbackModal
+        isOpen={feedbackModalOpen}
+        onClose={() => setFeedbackModalOpen(false)}
+        onSubmit={handleFeedbackSubmit}
+        messageId={selectedMessageId}
+      />
     </div>
   );
 };

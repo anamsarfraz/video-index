@@ -18,6 +18,8 @@ export interface ChatMessage {
     end: number;
   };
   feedback?: 'like' | 'dislike';
+  feedbackText?: string;
+  feedbackCategory?: string;
   timestamp: Date;
 }
 

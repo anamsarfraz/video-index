@@ -24,12 +24,27 @@ export const useChat = (initialMessages: ChatMessage[] = []) => {
     }, 1000);
   };
 
-  const addFeedback = (messageId: string, feedback: 'like' | 'dislike') => {
+  const addFeedback = (messageId: string, feedback: 'like' | 'dislike', feedbackText?: string, category?: string) => {
     setMessages(prev => 
       prev.map(msg => 
-        msg.id === messageId ? { ...msg, feedback } : msg
+        msg.id === messageId ? { 
+          ...msg, 
+          feedback,
+          ...(feedbackText && { feedbackText }),
+          ...(category && { feedbackCategory: category })
+        } : msg
       )
     );
+    
+    // Log feedback for analytics (in real app, this would be sent to backend)
+    if (feedback === 'dislike' && (feedbackText || category)) {
+      console.log('Negative feedback received:', {
+        messageId,
+        category,
+        feedbackText,
+        timestamp: new Date()
+      });
+    }
   };
 
   return {
