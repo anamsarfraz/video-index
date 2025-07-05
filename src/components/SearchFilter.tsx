@@ -7,6 +7,8 @@ interface SearchFilterProps {
   onSearch: (query: string) => void;
   onFilter: (filter: string) => void;
   onCreatePod: () => void;
+  onShowHero?: () => void;
+  showHero?: boolean;
 }
 
 const filterOptions: FilterOption[] = [
@@ -16,7 +18,7 @@ const filterOptions: FilterOption[] = [
   { value: 'category', label: 'By Category' }
 ];
 
-const SearchFilter: React.FC<SearchFilterProps> = ({ onSearch, onFilter, onCreatePod }) => {
+const SearchFilter: React.FC<SearchFilterProps> = ({ onSearch, onFilter, onCreatePod, onShowHero, showHero = true }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('recent');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -33,6 +35,11 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onSearch, onFilter, onCreat
     onFilter(filterValue);
   };
 
+  const handleLogoClick = () => {
+    if (onShowHero) {
+      onShowHero();
+    }
+  };
   return (
     <motion.div
       className="sticky top-0 z-40 bg-white/90 backdrop-blur-lg border-b border-gray-200/50 py-4 md:py-6"
@@ -41,6 +48,30 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onSearch, onFilter, onCreat
       transition={{ duration: 0.6 }}
     >
       <div className="max-w-7xl mx-auto px-4">
+        {/* Logo/Brand - Only show when hero is hidden */}
+        {!showHero && (
+          <motion.div
+            className="flex items-center justify-center mb-4"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <button
+              onClick={handleLogoClick}
+              className="flex items-center space-x-2 text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent hover:from-blue-500 hover:to-indigo-500 transition-all duration-300"
+            >
+              <motion.div
+                className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center"
+                whileHover={{ scale: 1.05, rotate: 5 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <span className="text-white font-bold text-sm">VI</span>
+              </motion.div>
+              <span>VideoIndex</span>
+            </button>
+          </motion.div>
+        )}
+
         {/* Mobile Layout */}
         <div className="md:hidden space-y-4">
           {/* Search Bar - Full Width on Mobile */}

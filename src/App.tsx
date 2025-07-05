@@ -51,7 +51,6 @@ function App() {
   }, [pods, searchQuery, filterOption]);
 
   const handleCreatePod = () => {
-    setShowHero(false);
     openCreateModal();
   };
 
@@ -68,6 +67,7 @@ function App() {
     };
 
     setPods(prev => [newPod, ...prev]);
+    setShowHero(false); // Hide hero only after successful pod creation
     closeCreateModal();
   };
 
@@ -79,15 +79,26 @@ function App() {
   const handleBackToHome = () => {
     setCurrentView('home');
     setSelectedPod(null);
+    // Scroll to top to show hero section
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    setShowHero(false);
+    if (query.trim()) {
+      setShowHero(false);
+    }
   };
 
   const handleFilter = (filter: string) => {
     setFilterOption(filter);
+  };
+
+  // Add function to show hero section
+  const handleShowHero = () => {
+    setShowHero(true);
+    setSearchQuery('');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Performance debugging toggle (for development)
@@ -132,6 +143,8 @@ function App() {
               onSearch={handleSearch}
               onFilter={handleFilter}
               onCreatePod={handleCreatePod}
+              onShowHero={handleShowHero}
+              showHero={showHero}
             />
 
             {/* Pod Grid */}
