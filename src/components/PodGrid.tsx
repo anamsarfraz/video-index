@@ -78,8 +78,6 @@ const PodGrid: React.FC<PodGridProps> = ({ pods, onPodClick }) => {
       }
     }
   };
-    onPodClick(pod);
-  }, [onPodClick]);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
