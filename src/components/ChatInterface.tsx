@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Mic, ThumbsUp, ThumbsDown, Clock } from 'lucide-react';
+import { Send, Mic, ThumbsUp, ThumbsDown, Clock, Brain, Search, Zap } from 'lucide-react';
 import { ChatMessage } from '../types';
 
 interface ChatInterfaceProps {
