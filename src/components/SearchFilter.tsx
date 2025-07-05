@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Plus, Filter, ChevronDown } from 'lucide-react';
+import { Search, Plus, Filter, ChevronDown, Sparkles } from 'lucide-react';
 import { FilterOption } from '../types';
 
 interface SearchFilterProps {
@@ -35,50 +35,141 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onSearch, onFilter, onCreat
 
   return (
     <motion.div
-      className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-200 py-6"
+      className="sticky top-0 z-40 bg-white/90 backdrop-blur-lg border-b border-gray-200/50 py-4 md:py-6"
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
     >
       <div className="max-w-7xl mx-auto px-4">
-        <div className="flex flex-col md:flex-row gap-4 items-center">
-          {/* Search Bar */}
-          <div className="relative flex-1 max-w-2xl">
+        {/* Mobile Layout */}
+        <div className="md:hidden space-y-4">
+          {/* Search Bar - Full Width on Mobile */}
+          <div className="relative">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Search your learning pods..."
+              placeholder="Search learning pods..."
               value={searchQuery}
               onChange={handleSearchChange}
-              className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+              className="w-full pl-12 pr-4 py-3 bg-gray-50/80 backdrop-blur-sm border border-gray-200/60 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-gray-900 placeholder-gray-500"
             />
+            {/* Search glow effect */}
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500/10 to-indigo-500/10 opacity-0 focus-within:opacity-100 transition-opacity duration-300 pointer-events-none" />
+          </div>
+
+          {/* Filter and Create Button Row */}
+          <div className="flex gap-3">
+            {/* Filter Dropdown - Compact */}
+            <div className="relative flex-1">
+              <button
+                onClick={() => setIsFilterOpen(!isFilterOpen)}
+                className="w-full flex items-center justify-between px-4 py-3 bg-gray-50/80 backdrop-blur-sm border border-gray-200/60 rounded-2xl hover:bg-gray-100/80 transition-all duration-200 text-gray-700"
+              >
+                <div className="flex items-center">
+                  <Filter className="w-4 h-4 mr-2 text-gray-600" />
+                  <span className="text-sm font-medium truncate">
+                    {filterOptions.find(opt => opt.value === selectedFilter)?.label}
+                  </span>
+                </div>
+                <ChevronDown className={`w-4 h-4 text-gray-600 transition-transform duration-200 ${isFilterOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {/* Filter Dropdown Menu */}
+              {isFilterOpen && (
+                <motion.div
+                  className="absolute top-full left-0 right-0 mt-2 bg-white/95 backdrop-blur-lg border border-gray-200/60 rounded-2xl shadow-xl z-50"
+                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {filterOptions.map((option, index) => (
+                    <button
+                      key={option.value}
+                      onClick={() => handleFilterSelect(option.value)}
+                      className={`w-full px-4 py-3 text-left text-sm hover:bg-blue-50/80 transition-colors duration-200 ${
+                        index === 0 ? 'rounded-t-2xl' : ''
+                      } ${
+                        index === filterOptions.length - 1 ? 'rounded-b-2xl' : ''
+                      } ${
+                        selectedFilter === option.value ? 'bg-blue-50/80 text-blue-700 font-medium' : 'text-gray-700'
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </div>
+
+            {/* Create Pod Button - Compact */}
+            <motion.button
+              onClick={onCreatePod}
+              className="flex items-center justify-center px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-2xl hover:from-blue-500 hover:to-indigo-500 transition-all duration-200 shadow-lg hover:shadow-xl min-w-[120px]"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Plus className="w-5 h-5 mr-2" />
+              <span className="text-sm">Create</span>
+            </motion.button>
+          </div>
+        </div>
+
+        {/* Desktop Layout */}
+        <div className="hidden md:flex gap-6 items-center">
+          {/* Search Bar */}
+          <div className="relative flex-1 max-w-2xl group">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search learning pods with AI precision..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              className="w-full pl-12 pr-4 py-3 bg-gray-50/80 backdrop-blur-sm border border-gray-200/60 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-gray-900 placeholder-gray-500 group-hover:bg-gray-100/80"
+            />
+            {/* Search enhancement effects */}
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500/5 to-indigo-500/5 opacity-0 focus-within:opacity-100 transition-opacity duration-300 pointer-events-none" />
+            <motion.div
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 opacity-0 group-focus-within:opacity-100"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Sparkles className="w-4 h-4 text-blue-500" />
+            </motion.div>
           </div>
 
           {/* Filter Dropdown */}
-          <div className="relative">
+          <div className="relative group">
             <button
               onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className="flex items-center px-4 py-3 bg-gray-50 border border-gray-200 rounded-full hover:bg-gray-100 transition-colors duration-200"
+              className="flex items-center px-6 py-3 bg-gray-50/80 backdrop-blur-sm border border-gray-200/60 rounded-2xl hover:bg-gray-100/80 transition-all duration-200 text-gray-700 group-hover:border-gray-300/60"
             >
               <Filter className="w-4 h-4 mr-2 text-gray-600" />
               <span className="text-sm font-medium text-gray-700">
                 {filterOptions.find(opt => opt.value === selectedFilter)?.label}
               </span>
-              <ChevronDown className="w-4 h-4 ml-2 text-gray-600" />
+              <ChevronDown className={`w-4 h-4 ml-2 text-gray-600 transition-transform duration-200 ${isFilterOpen ? 'rotate-180' : ''}`} />
             </button>
 
+            {/* Filter Dropdown Menu */}
             {isFilterOpen && (
               <motion.div
-                className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
+                className="absolute right-0 mt-2 w-56 bg-white/95 backdrop-blur-lg border border-gray-200/60 rounded-2xl shadow-xl z-50"
+                initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ duration: 0.2 }}
               >
-                {filterOptions.map((option) => (
+                {filterOptions.map((option, index) => (
                   <button
                     key={option.value}
                     onClick={() => handleFilterSelect(option.value)}
-                    className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 transition-colors duration-200 first:rounded-t-lg last:rounded-b-lg"
+                    className={`w-full px-4 py-3 text-left text-sm hover:bg-blue-50/80 transition-colors duration-200 ${
+                      index === 0 ? 'rounded-t-2xl' : ''
+                    } ${
+                      index === filterOptions.length - 1 ? 'rounded-b-2xl' : ''
+                    } ${
+                      selectedFilter === option.value ? 'bg-blue-50/80 text-blue-700 font-medium' : 'text-gray-700'
+                    }`}
                   >
                     {option.label}
                   </button>
@@ -90,15 +181,38 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onSearch, onFilter, onCreat
           {/* Create Pod Button */}
           <motion.button
             onClick={onCreatePod}
-            className="flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors duration-200 shadow-lg hover:shadow-xl"
-            whileHover={{ scale: 1.05 }}
+            className="group relative flex items-center px-8 py-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white font-semibold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl overflow-hidden"
+            whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.95 }}
           >
-            <Plus className="w-5 h-5 mr-2" />
-            Create Pod
+            {/* Animated background */}
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500 opacity-0 group-hover:opacity-100"
+              animate={{
+                backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+              style={{
+                backgroundSize: '200% 100%',
+              }}
+            />
+            <Plus className="relative z-10 w-5 h-5 mr-2 group-hover:rotate-90 transition-transform duration-200" />
+            <span className="relative z-10">Create Pod</span>
           </motion.button>
         </div>
       </div>
+      
+      {/* Click outside to close filter */}
+      {isFilterOpen && (
+        <div
+          className="fixed inset-0 z-30"
+          onClick={() => setIsFilterOpen(false)}
+        />
+      )}
     </motion.div>
   );
 };

@@ -155,21 +155,112 @@ const Hero: React.FC<HeroProps> = ({ onCreatePod }) => {
           </motion.p>
 
           {/* CTA Button */}
-          <motion.button
-            onClick={onCreatePod}
-            className="group relative inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-lg rounded-full hover:from-blue-500 hover:to-indigo-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+          <motion.div
+            className="relative inline-block"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.7 }}
+          >
+            {/* Particle flow container */}
+            <div className="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
+              {/* Flowing particles towards button */}
+              {[...Array(12)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute w-1 h-1 bg-cyan-300 rounded-full opacity-0"
+                  style={{
+                    left: `${-50 + Math.random() * 200}%`,
+                    top: `${-50 + Math.random() * 200}%`,
+                  }}
+                  animate={{
+                    x: [0, 50, 100],
+                    y: [0, Math.random() * 20 - 10, 0],
+                    opacity: [0, 0.8, 0],
+                    scale: [0, 1, 0],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    delay: i * 0.2,
+                    ease: "easeInOut",
+                  }}
+                />
+              ))}
+            </div>
+
+            <motion.button
+            onClick={onCreatePod}
+            className="group relative inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white font-semibold text-lg rounded-full transition-all duration-300 shadow-lg hover:shadow-2xl overflow-hidden"
+            style={{
+              backgroundSize: '200% 100%',
+            }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
+            {/* Animated gradient background */}
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500 opacity-0 group-hover:opacity-100"
+              animate={{
+                backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+              style={{
+                backgroundSize: '200% 100%',
+              }}
+            />
+
+            {/* Shimmering effect */}
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12"
+              animate={{
+                x: ['-100%', '100%'],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                repeatDelay: 1,
+                ease: "easeInOut",
+              }}
+            />
+
+            {/* Button content */}
+            <span className="relative z-10 mr-2">Start Learning Now</span>
             <span className="mr-2">Start Learning Now</span>
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
+            <ArrowRight className="relative z-10 w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
             
             {/* Button glow effect */}
-            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-300" />
+            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-400 to-purple-400 opacity-0 group-hover:opacity-30 blur-xl transition-opacity duration-300" />
+            
+            {/* Particle burst on hover */}
+            <div className="absolute inset-0 pointer-events-none">
+              {[...Array(8)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute w-1 h-1 bg-white rounded-full opacity-0 group-hover:opacity-100"
+                  style={{
+                    left: '50%',
+                    top: '50%',
+                  }}
+                  animate={{
+                    x: [0, (Math.cos((i * Math.PI * 2) / 8) * 30)],
+                    y: [0, (Math.sin((i * Math.PI * 2) / 8) * 30)],
+                    opacity: [0, 1, 0],
+                    scale: [0, 1, 0],
+                  }}
+                  transition={{
+                    duration: 0.6,
+                    delay: i * 0.05,
+                    ease: "easeOut",
+                  }}
+                />
+              ))}
+            </div>
           </motion.button>
+          </motion.div>
 
           {/* Feature highlights */}
           <motion.div
