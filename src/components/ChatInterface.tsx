@@ -1,0 +1,196 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Send, Mic, ThumbsUp, ThumbsDown, Clock } from 'lucide-react';
+import { ChatMessage } from '../types';
+
+interface ChatInterfaceProps {
+  messages: ChatMessage[];
+  onSendMessage: (message: string) => void;
+  onFeedback: (messageId: string, feedback: 'like' | 'dislike') => void;
+  isLoading?: boolean;
+  onJumpToTime?: (time: number) => void;
+}
+
+const ChatInterface: React.FC<ChatInterfaceProps> = ({
+  messages,
+  onSendMessage,
+  onFeedback,
+  isLoading,
+  onJumpToTime
+}) => {
+  const [inputMessage, setInputMessage] = useState('');
+  const [isRecording, setIsRecording] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (inputMessage.trim()) {
+      onSendMessage(inputMessage.trim());
+      setInputMessage('');
+    }
+  };
+
+  const handleVoiceRecord = () => {
+    setIsRecording(!isRecording);
+    // Voice recording logic would go here
+  };
+
+  const formatTimestamp = (date: Date) => {
+    return date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  return (
+    <div className="flex flex-col h-full bg-gray-50 rounded-lg">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200 p-4 rounded-t-lg">
+        <h3 className="font-semibold text-gray-900">Q&A Chat</h3>
+        <p className="text-sm text-gray-500">Ask questions about the video content</p>
+      </div>
+
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <AnimatePresence>
+          {messages.map((message, index) => (
+            <motion.div
+              key={message.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
+              className="space-y-3"
+            >
+              {/* Question */}
+              <div className="flex justify-end">
+                <div className="max-w-xs bg-blue-600 text-white rounded-lg px-4 py-2">
+                  <p className="text-sm">{message.question}</p>
+                  <p className="text-xs text-blue-100 mt-1">
+                    {formatTimestamp(message.timestamp)}
+                  </p>
+                </div>
+              </div>
+
+              {/* Answer */}
+              <div className="flex justify-start">
+                <div className="max-w-sm bg-white rounded-lg px-4 py-3 shadow-sm border border-gray-200">
+                  <p className="text-sm text-gray-800 mb-2">{message.answer}</p>
+                  
+                  {/* Video Snippet */}
+                  {message.videoSnippet && (
+                    <button
+                      onClick={() => onJumpToTime?.(message.videoSnippet!.start)}
+                      className="flex items-center text-xs text-blue-600 hover:text-blue-700 transition-colors duration-200 mb-2"
+                    >
+                      <Clock className="w-3 h-3 mr-1" />
+                      Jump to {Math.floor(message.videoSnippet.start / 60)}:{(message.videoSnippet.start % 60).toString().padStart(2, '0')}
+                    </button>
+                  )}
+
+                  {/* Feedback Buttons */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => onFeedback(message.id, 'like')}
+                        className={`p-1 rounded transition-colors duration-200 ${
+                          message.feedback === 'like'
+                            ? 'text-green-600 bg-green-50'
+                            : 'text-gray-400 hover:text-green-600'
+                        }`}
+                      >
+                        <ThumbsUp className="w-3 h-3" />
+                      </button>
+                      <button
+                        onClick={() => onFeedback(message.id, 'dislike')}
+                        className={`p-1 rounded transition-colors duration-200 ${
+                          message.feedback === 'dislike'
+                            ? 'text-red-600 bg-red-50'
+                            : 'text-gray-400 hover:text-red-600'
+                        }`}
+                      >
+                        <ThumbsDown className="w-3 h-3" />
+                      </button>
+                    </div>
+                    <span className="text-xs text-gray-500">
+                      {formatTimestamp(message.timestamp)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+
+        {/* Loading Message */}
+        {isLoading && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex justify-start"
+          >
+            <div className="bg-white rounded-lg px-4 py-3 shadow-sm border border-gray-200">
+              <div className="flex items-center space-x-2">
+                <div className="flex space-x-1">
+                  <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" />
+                  <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
+                  <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                </div>
+                <span className="text-sm text-gray-500">AI is thinking...</span>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Input Form */}
+      <form onSubmit={handleSubmit} className="p-4 bg-white border-t border-gray-200 rounded-b-lg">
+        <div className="flex items-center space-x-2">
+          <div className="flex-1 relative">
+            <input
+              ref={inputRef}
+              type="text"
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              placeholder="Ask a question about the video..."
+              className="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          
+          <button
+            type="button"
+            onClick={handleVoiceRecord}
+            className={`p-2 rounded-full transition-colors duration-200 ${
+              isRecording
+                ? 'bg-red-600 text-white'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            <Mic className="w-5 h-5" />
+          </button>
+          
+          <button
+            type="submit"
+            disabled={!inputMessage.trim() || isLoading}
+            className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+          >
+            <Send className="w-5 h-5" />
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default ChatInterface;
