@@ -212,7 +212,6 @@ const PodCard: React.FC<PodCardProps> = memo(({ pod, onClick, animationDelay = 0
             transition={prefersReducedMotion ? {} : { delay: animationDelay + 0.6, duration: 0.8, ease: "easeOut" }}
           />
         </motion.div>
-      </div>
 
       {/* Hover Glow Effect */}
       {!prefersReducedMotion && (
