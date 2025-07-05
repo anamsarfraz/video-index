@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, AlertCircle, Send } from 'lucide-react';
+import { X, MessageSquare, Send, CheckCircle } from 'lucide-react';
 
 interface FeedbackModalProps {
   isOpen: boolean;
@@ -10,17 +10,38 @@ interface FeedbackModalProps {
 }
 
 const feedbackCategories = [
-  { value: 'incorrect', label: 'Incorrect information' },
-  { value: 'irrelevant', label: 'Not relevant to my question' },
-  { value: 'unclear', label: 'Response is unclear or confusing' },
-  { value: 'incomplete', label: 'Missing important details' },
-  { value: 'other', label: 'Other (please specify)' }
+  { 
+    value: 'incorrect', 
+    label: 'Incorrect information',
+    description: 'The response contains factual errors'
+  },
+  { 
+    value: 'irrelevant', 
+    label: 'Not relevant',
+    description: 'Doesn\'t answer my question'
+  },
+  { 
+    value: 'unclear', 
+    label: 'Unclear or confusing',
+    description: 'Hard to understand or poorly explained'
+  },
+  { 
+    value: 'incomplete', 
+    label: 'Incomplete',
+    description: 'Missing important information'
+  },
+  { 
+    value: 'other', 
+    label: 'Something else',
+    description: 'Other issue not listed above'
+  }
 ];
 
 const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, onSubmit, messageId }) => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [feedbackText, setFeedbackText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,21 +51,28 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, onSubmit
     setIsSubmitting(true);
     
     // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 800));
+    await new Promise(resolve => setTimeout(resolve, 1000));
     
     onSubmit(feedbackText, selectedCategory);
     
-    // Reset form
-    setSelectedCategory('');
-    setFeedbackText('');
     setIsSubmitting(false);
-    onClose();
+    setIsSubmitted(true);
+    
+    // Auto close after showing success
+    setTimeout(() => {
+      handleClose();
+    }, 1500);
   };
 
   const handleClose = () => {
     setSelectedCategory('');
     setFeedbackText('');
+    setIsSubmitted(false);
     onClose();
+  };
+
+  const handleCategorySelect = (value: string) => {
+    setSelectedCategory(value);
   };
 
   return (
@@ -58,7 +86,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, onSubmit
         >
           {/* Backdrop */}
           <motion.div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -67,125 +95,162 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, onSubmit
 
           {/* Modal */}
           <motion.div
-            className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto"
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            className="relative bg-white rounded-3xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden"
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            transition={{ duration: 0.3 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
           >
-            {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                  <AlertCircle className="w-5 h-5 text-red-600" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900">Improve this response</h2>
-                  <p className="text-sm text-gray-500">Help us understand what went wrong</p>
-                </div>
-              </div>
-              <button
-                onClick={handleClose}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
-              >
-                <X className="w-5 h-5 text-gray-500" />
-              </button>
-            </div>
-
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="p-6">
-              {/* Category Selection */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-3">
-                  What was the main issue with this response?
-                </label>
-                <div className="space-y-2">
-                  {feedbackCategories.map((category) => (
-                    <label
-                      key={category.value}
-                      className={`flex items-center p-3 border rounded-lg cursor-pointer transition-all duration-200 ${
-                        selectedCategory === category.value
-                          ? 'border-red-500 bg-red-50'
-                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="category"
-                        value={category.value}
-                        checked={selectedCategory === category.value}
-                        onChange={(e) => setSelectedCategory(e.target.value)}
-                        className="sr-only"
-                      />
-                      <div className={`w-4 h-4 rounded-full border-2 mr-3 flex items-center justify-center ${
-                        selectedCategory === category.value
-                          ? 'border-red-500 bg-red-500'
-                          : 'border-gray-300'
-                      }`}>
-                        {selectedCategory === category.value && (
-                          <div className="w-2 h-2 bg-white rounded-full" />
-                        )}
-                      </div>
-                      <span className="text-sm text-gray-700">{category.label}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Additional Feedback */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Additional details (optional)
-                </label>
-                <textarea
-                  value={feedbackText}
-                  onChange={(e) => setFeedbackText(e.target.value)}
-                  rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
-                  placeholder="Tell us more about what could be improved..."
-                />
-              </div>
-
-              {/* Info Box */}
-              <div className="mb-6 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <div className="flex items-start">
-                  <AlertCircle className="w-4 h-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="text-sm text-blue-800">
-                      Your feedback helps us improve our AI responses. This information will be used to enhance future answers.
-                    </p>
+            {!isSubmitted ? (
+              <>
+                {/* Header */}
+                <div className="relative px-6 pt-6 pb-4">
+                  <button
+                    onClick={handleClose}
+                    className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
+                  >
+                    <X className="w-5 h-5 text-gray-400" />
+                  </button>
+                  
+                  <div className="flex items-center space-x-3 mb-2">
+                    <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+                      <MessageSquare className="w-5 h-5 text-orange-600" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-semibold text-gray-900">Help us improve</h2>
+                    </div>
                   </div>
+                  <p className="text-gray-600 text-sm ml-13">
+                    What could we have done better with this response?
+                  </p>
                 </div>
-              </div>
 
-              {/* Actions */}
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={handleClose}
-                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors duration-200"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={!selectedCategory || isSubmitting}
-                  className="flex-1 px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center justify-center"
-                >
-                  {isSubmitting ? (
-                    <div className="flex items-center">
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                      Sending...
+                {/* Form */}
+                <form onSubmit={handleSubmit} className="px-6 pb-6">
+                  {/* Category Selection */}
+                  <div className="mb-6">
+                    <div className="space-y-2">
+                      {feedbackCategories.map((category) => (
+                        <motion.button
+                          key={category.value}
+                          type="button"
+                          onClick={() => handleCategorySelect(category.value)}
+                          className={`w-full text-left p-4 border-2 rounded-xl transition-all duration-200 ${
+                            selectedCategory === category.value
+                              ? 'border-orange-500 bg-orange-50 shadow-sm'
+                              : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                          }`}
+                          whileHover={{ scale: 1.01 }}
+                          whileTap={{ scale: 0.99 }}
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="font-medium text-gray-900 mb-1">
+                                {category.label}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                {category.description}
+                              </div>
+                            </div>
+                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ml-3 mt-0.5 ${
+                              selectedCategory === category.value
+                                ? 'border-orange-500 bg-orange-500'
+                                : 'border-gray-300'
+                            }`}>
+                              {selectedCategory === category.value && (
+                                <motion.div
+                                  className="w-2 h-2 bg-white rounded-full"
+                                  initial={{ scale: 0 }}
+                                  animate={{ scale: 1 }}
+                                  transition={{ duration: 0.2 }}
+                                />
+                              )}
+                            </div>
+                          </div>
+                        </motion.button>
+                      ))}
                     </div>
-                  ) : (
-                    <div className="flex items-center">
-                      <Send className="w-4 h-4 mr-2" />
-                      Submit Feedback
-                    </div>
-                  )}
-                </button>
-              </div>
-            </form>
+                  </div>
+
+                  {/* Additional Feedback - Only show if category selected */}
+                  <AnimatePresence>
+                    {selectedCategory && (
+                      <motion.div
+                        className="mb-6"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <label className="block text-sm font-medium text-gray-700 mb-3">
+                          Tell us more (optional)
+                        </label>
+                        <textarea
+                          value={feedbackText}
+                          onChange={(e) => setFeedbackText(e.target.value)}
+                          rows={3}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none transition-all duration-200"
+                          placeholder="What specifically could be improved?"
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {/* Actions */}
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      onClick={handleClose}
+                      className="flex-1 px-6 py-3 text-gray-700 font-medium rounded-xl hover:bg-gray-100 transition-colors duration-200"
+                    >
+                      Cancel
+                    </button>
+                    <motion.button
+                      type="submit"
+                      disabled={!selectedCategory || isSubmitting}
+                      className="flex-1 px-6 py-3 bg-orange-600 text-white font-medium rounded-xl hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center"
+                      whileHover={!selectedCategory || isSubmitting ? {} : { scale: 1.02 }}
+                      whileTap={!selectedCategory || isSubmitting ? {} : { scale: 0.98 }}
+                    >
+                      {isSubmitting ? (
+                        <div className="flex items-center">
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                          Sending...
+                        </div>
+                      ) : (
+                        <div className="flex items-center">
+                          <Send className="w-4 h-4 mr-2" />
+                          Send feedback
+                        </div>
+                      )}
+                    </motion.button>
+                  </div>
+                </form>
+              </>
+            ) : (
+              /* Success State */
+              <motion.div
+                className="p-8 text-center"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                <motion.div
+                  className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
+                >
+                  <CheckCircle className="w-8 h-8 text-green-600" />
+                </motion.div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Thank you for your feedback!
+                </h3>
+                <p className="text-gray-600 text-sm">
+                  Your input helps us improve our AI responses.
+                </p>
+              </motion.div>
+            )}
           </motion.div>
         </motion.div>
       )}
