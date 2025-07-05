@@ -95,7 +95,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, onSubmit
 
           {/* Modal */}
           <motion.div
-            className="relative bg-white rounded-3xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden"
+            className="relative bg-white rounded-3xl shadow-2xl w-full max-w-md mx-4 max-h-[80vh] overflow-hidden flex flex-col"
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -104,7 +104,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, onSubmit
             {!isSubmitted ? (
               <>
                 {/* Header */}
-                <div className="relative px-6 pt-6 pb-4">
+                <div className="relative px-6 pt-6 pb-4 flex-shrink-0">
                   <button
                     onClick={handleClose}
                     className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
@@ -126,7 +126,8 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, onSubmit
                 </div>
 
                 {/* Form */}
-                <form onSubmit={handleSubmit} className="px-6 pb-6">
+                <div className="flex-1 overflow-y-auto">
+                  <form onSubmit={handleSubmit} className="px-6 pb-6">
                   {/* Category Selection */}
                   <div className="mb-6">
                     <div className="space-y-2">
@@ -197,7 +198,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, onSubmit
                   </AnimatePresence>
 
                   {/* Actions */}
-                  <div className="flex gap-3">
+                  <div className="flex gap-3 sticky bottom-0 bg-white pt-4 -mx-6 px-6">
                     <button
                       type="button"
                       onClick={handleClose}
@@ -225,7 +226,8 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, onSubmit
                       )}
                     </motion.button>
                   </div>
-                </form>
+                  </form>
+                </div>
               </>
             ) : (
               /* Success State */
