@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Brain, Zap, ArrowRight } from 'lucide-react';
+import { Brain, Zap, ArrowRight, Sparkles, Play, Users, Clock } from 'lucide-react';
 
 interface HeroProps {
   onCreatePod: () => void;
@@ -8,100 +8,57 @@ interface HeroProps {
 
 const Hero: React.FC<HeroProps> = ({ onCreatePod }) => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
-      {/* Dynamic Neural Network Background */}
-      <div className="absolute inset-0">
-        {/* Flowing data streams */}
-        <svg className="absolute inset-0 w-full h-full opacity-20" viewBox="0 0 1000 1000">
-          {[...Array(8)].map((_, i) => (
-            <motion.path
-              key={i}
-              d={`M${100 + i * 120},0 Q${200 + i * 120},${300 + i * 50} ${150 + i * 120},600 T${200 + i * 120},1000`}
-              stroke="url(#gradient)"
-              strokeWidth="2"
-              fill="none"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 0.6 }}
-              transition={{
-                duration: 3 + i * 0.5,
-                repeat: Infinity,
-                repeatType: "loop",
-                ease: "easeInOut",
-                delay: i * 0.3
-              }}
-            />
-          ))}
+    <section className="relative h-[80vh] flex items-center justify-center overflow-hidden">
+      {/* Animated Light Gradient Background */}
+      <motion.div
+        className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50"
+        animate={{
+          background: [
+            'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 25%, #f3e8ff 50%, #fef3c7 75%, #ecfdf5 100%)',
+            'linear-gradient(135deg, #ecfdf5 0%, #f0f9ff 25%, #fef3c7 50%, #e0f2fe 75%, #f3e8ff 100%)',
+            'linear-gradient(135deg, #f3e8ff 0%, #fef3c7 25%, #ecfdf5 50%, #f0f9ff 75%, #e0f2fe 100%)',
+            'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 25%, #f3e8ff 50%, #fef3c7 75%, #ecfdf5 100%)',
+          ],
+        }}
+        transition={{
+          duration: 12,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      />
+
+      {/* Subtle Overlay Pattern */}
+      <div className="absolute inset-0 opacity-30">
+        <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
           <defs>
-            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#60A5FA" stopOpacity="0.8" />
-              <stop offset="50%" stopColor="#3B82F6" stopOpacity="0.6" />
-              <stop offset="100%" stopColor="#1D4ED8" stopOpacity="0.4" />
-            </linearGradient>
+            <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
+              <circle cx="5" cy="5" r="0.5" fill="currentColor" className="text-blue-200" opacity="0.3" />
+            </pattern>
           </defs>
+          <rect width="100" height="100" fill="url(#grid)" />
         </svg>
+      </div>
 
-        {/* Neural network nodes */}
-        {[...Array(25)].map((_, i) => (
+      {/* Floating Elements */}
+      <div className="absolute inset-0 pointer-events-none">
+        {[...Array(12)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-2 h-2 bg-blue-400 rounded-full"
+            className="absolute w-2 h-2 bg-gradient-to-r from-blue-300 to-indigo-300 rounded-full opacity-40"
             style={{
-              left: `${10 + (i % 5) * 20}%`,
-              top: `${15 + Math.floor(i / 5) * 20}%`,
+              left: `${10 + (i * 8) % 80}%`,
+              top: `${15 + (i * 12) % 70}%`,
             }}
             animate={{
-              scale: [1, 1.5, 1],
-              opacity: [0.3, 0.8, 0.3],
+              y: [0, -30, 0],
+              x: [0, Math.sin(i) * 20, 0],
+              opacity: [0.2, 0.6, 0.2],
+              scale: [1, 1.2, 1],
             }}
             transition={{
-              duration: 2 + Math.random() * 2,
+              duration: 4 + (i % 3),
               repeat: Infinity,
-              delay: Math.random() * 2,
-            }}
-          />
-        ))}
-
-        {/* Connecting lines between nodes */}
-        <svg className="absolute inset-0 w-full h-full opacity-10">
-          {[...Array(15)].map((_, i) => (
-            <motion.line
-              key={i}
-              x1={`${10 + (i % 5) * 20}%`}
-              y1={`${15 + Math.floor(i / 5) * 20}%`}
-              x2={`${10 + ((i + 1) % 5) * 20}%`}
-              y2={`${15 + Math.floor((i + 1) / 5) * 20}%`}
-              stroke="#60A5FA"
-              strokeWidth="1"
-              initial={{ pathLength: 0 }}
-              animate={{ pathLength: 1 }}
-              transition={{
-                duration: 2,
-                delay: i * 0.1,
-                repeat: Infinity,
-                repeatType: "reverse",
-              }}
-            />
-          ))}
-        </svg>
-
-        {/* Floating particles */}
-        {[...Array(30)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 bg-cyan-300 rounded-full opacity-40"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -100, 0],
-              x: [0, Math.random() * 50 - 25, 0],
-              opacity: [0.2, 0.8, 0.2],
-            }}
-            transition={{
-              duration: 4 + Math.random() * 4,
-              repeat: Infinity,
-              delay: Math.random() * 3,
+              delay: i * 0.5,
               ease: "easeInOut",
             }}
           />
@@ -109,274 +66,231 @@ const Hero: React.FC<HeroProps> = ({ onCreatePod }) => {
       </div>
 
       {/* Content Container */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-        {/* Left Column - Text Content */}
-        <motion.div
-          className="text-center lg:text-left"
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          {/* Innovation Badge */}
+      <div className="relative z-10 max-w-7xl mx-auto px-[4%] md:px-[6%] lg:px-[8%] xl:px-[10%] w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          
+          {/* Left Column - Main Content */}
           <motion.div
-            className="inline-flex items-center px-4 py-2 bg-blue-500/20 border border-blue-400/30 rounded-full text-blue-300 text-sm font-medium mb-6 backdrop-blur-sm"
-            initial={{ opacity: 0, y: 20 }}
+            className="text-center lg:text-left space-y-8"
+            initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <Zap className="w-4 h-4 mr-2" />
-            AI-Powered Learning Revolution
-          </motion.div>
+            {/* Innovation Badge */}
+            <motion.div
+              className="inline-flex items-center px-4 py-2 bg-white/60 backdrop-blur-sm border border-blue-200/50 rounded-full text-blue-700 text-sm font-medium shadow-sm"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              whileHover={{ 
+                scale: 1.05,
+                backgroundColor: "rgba(255, 255, 255, 0.8)",
+                transition: { duration: 0.2 }
+              }}
+            >
+              <Sparkles className="w-4 h-4 mr-2 text-blue-600" />
+              AI-Powered Learning Revolution
+            </motion.div>
 
-          {/* Headline */}
-          <motion.h1
-            className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-          >
-            <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-indigo-400 bg-clip-text text-transparent">
-              Learn Smarter
-            </span>
-            <br />
-            <span className="text-white">
-              With AI
-            </span>
-          </motion.h1>
+            {/* Main Headline */}
+            <motion.div
+              className="space-y-4"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+            >
+              <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
+                <span className="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 bg-clip-text text-transparent">
+                  Transform Learning
+                </span>
+                <br />
+                <span className="text-gray-800">
+                  With AI Intelligence
+                </span>
+              </h1>
+              
+              <motion.p
+                className="text-lg md:text-xl lg:text-2xl text-gray-600 leading-relaxed max-w-2xl"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.8, delay: 0.5 }}
+              >
+                Turn any video into an interactive learning experience with instant Q&A, 
+                smart insights, and personalized knowledge extraction.
+              </motion.p>
+            </motion.div>
 
-          {/* Subheadline */}
-          <motion.p
-            className="text-xl md:text-2xl text-blue-100 mb-8 max-w-2xl leading-relaxed"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
-          >
-            Transform any video into an intelligent learning experience with instant Q&A and personalized insights.
-          </motion.p>
-
-          {/* CTA Button */}
-          <motion.div
-            className="relative inline-block"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.7 }}
-          >
-            {/* Particle flow container */}
-            <div className="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
-              {/* Flowing particles towards button */}
-              {[...Array(12)].map((_, i) => (
+            {/* Feature Highlights */}
+            <motion.div
+              className="flex flex-wrap gap-6 justify-center lg:justify-start text-sm text-gray-600"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.7 }}
+            >
+              {[
+                { icon: Brain, text: "AI-Powered Analysis" },
+                { icon: Clock, text: "Instant Responses" },
+                { icon: Users, text: "Collaborative Learning" }
+              ].map((feature, index) => (
                 <motion.div
-                  key={i}
-                  className="absolute w-1 h-1 bg-cyan-300 rounded-full opacity-0"
-                  style={{
-                    left: `${-50 + Math.random() * 200}%`,
-                    top: `${-50 + Math.random() * 200}%`,
+                  key={index}
+                  className="flex items-center space-x-2 bg-white/40 backdrop-blur-sm px-3 py-2 rounded-full border border-gray-200/50"
+                  whileHover={{ 
+                    scale: 1.05,
+                    backgroundColor: "rgba(255, 255, 255, 0.6)",
+                    transition: { duration: 0.2 }
                   }}
-                  animate={{
-                    x: [0, 50, 100],
-                    y: [0, Math.random() * 20 - 10, 0],
-                    opacity: [0, 0.8, 0],
-                    scale: [0, 1, 0],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    delay: i * 0.2,
-                    ease: "easeInOut",
-                  }}
-                />
+                >
+                  <feature.icon className="w-4 h-4 text-blue-600" />
+                  <span className="font-medium">{feature.text}</span>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
 
-            <motion.button
-            onClick={onCreatePod}
-            className="group relative inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white font-semibold text-lg rounded-full transition-all duration-300 shadow-lg hover:shadow-2xl overflow-hidden"
-            style={{
-              backgroundSize: '200% 100%',
-            }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            {/* Animated gradient background */}
+            {/* CTA Button */}
             <motion.div
-              className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500 opacity-0 group-hover:opacity-100"
-              animate={{
-                backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: "linear",
-              }}
-              style={{
-                backgroundSize: '200% 100%',
-              }}
-            />
-
-            {/* Shimmering effect */}
-            <motion.div
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12"
-              animate={{
-                x: ['-100%', '100%'],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                repeatDelay: 1,
-                ease: "easeInOut",
-              }}
-            />
-
-            {/* Button content */}
-            <span className="relative z-10 mr-2">Create New Pod</span>
-            <ArrowRight className="relative z-10 w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
-            
-            {/* Button glow effect */}
-            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-400 to-purple-400 opacity-0 group-hover:opacity-30 blur-xl transition-opacity duration-300" />
-            
-            {/* Particle burst on hover */}
-            <div className="absolute inset-0 pointer-events-none">
-              {[...Array(8)].map((_, i) => (
+              className="pt-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.9 }}
+            >
+              <motion.button
+                onClick={onCreatePod}
+                className="group relative inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white font-semibold text-lg rounded-2xl shadow-lg overflow-hidden"
+                whileHover={{ 
+                  scale: 1.05,
+                  boxShadow: "0 20px 40px -12px rgba(59, 130, 246, 0.4)",
+                  transition: { duration: 0.3 }
+                }}
+                whileTap={{ scale: 0.98 }}
+              >
+                {/* Animated background */}
                 <motion.div
-                  key={i}
-                  className="absolute w-1 h-1 bg-white rounded-full opacity-0 group-hover:opacity-100"
-                  style={{
-                    left: '50%',
-                    top: '50%',
-                  }}
-                  animate={{
-                    x: [0, (Math.cos((i * Math.PI * 2) / 8) * 30)],
-                    y: [0, (Math.sin((i * Math.PI * 2) / 8) * 30)],
-                    opacity: [0, 1, 0],
-                    scale: [0, 1, 0],
-                  }}
-                  transition={{
-                    duration: 0.6,
-                    delay: i * 0.05,
-                    ease: "easeOut",
-                  }}
+                  className="absolute inset-0 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 opacity-0 group-hover:opacity-100"
+                  transition={{ duration: 0.3 }}
                 />
-              ))}
-            </div>
-          </motion.button>
+                
+                {/* Shimmer effect */}
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%]"
+                  transition={{ duration: 0.8, ease: "easeInOut" }}
+                />
+                
+                <span className="relative z-10 mr-2">Create Your First Pod</span>
+                <ArrowRight className="relative z-10 w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
+              </motion.button>
+            </motion.div>
           </motion.div>
 
-          {/* Feature highlights */}
+          {/* Right Column - Visual Element */}
           <motion.div
-            className="flex flex-wrap gap-6 mt-8 text-blue-200 text-sm"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.9 }}
+            className="relative flex items-center justify-center"
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
           >
-            <div className="flex items-center">
-              <div className="w-2 h-2 bg-green-400 rounded-full mr-2" />
-              Instant AI Responses
-            </div>
-            <div className="flex items-center">
-              <div className="w-2 h-2 bg-green-400 rounded-full mr-2" />
-              Smart Video Analysis
-            </div>
-            <div className="flex items-center">
-              <div className="w-2 h-2 bg-green-400 rounded-full mr-2" />
-              Personalized Learning
-            </div>
-          </motion.div>
-        </motion.div>
-
-        {/* Right Column - 3D Brain Visualization */}
-        <motion.div
-          className="relative flex items-center justify-center"
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-        >
-          {/* Main brain container */}
-          <div className="relative w-80 h-80 lg:w-96 lg:h-96">
-            {/* Outer glow ring */}
-            <motion.div
-              className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500/20 to-indigo-500/20 blur-2xl"
-              animate={{
-                scale: [1, 1.1, 1],
-                opacity: [0.3, 0.6, 0.3],
-              }}
-              transition={{
-                duration: 4,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-            />
-
-            {/* Brain icon with neural connections */}
-            <div className="absolute inset-0 flex items-center justify-center">
+            {/* Main Visual Container */}
+            <div className="relative w-80 h-80 lg:w-96 lg:h-96">
+              
+              {/* Outer Glow Ring */}
               <motion.div
-                className="relative"
+                className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-200/40 via-indigo-200/40 to-purple-200/40 blur-3xl"
                 animate={{
-                  rotateY: [0, 360],
+                  scale: [1, 1.1, 1],
+                  opacity: [0.3, 0.6, 0.3],
                 }}
                 transition={{
-                  duration: 20,
+                  duration: 4,
                   repeat: Infinity,
-                  ease: "linear",
+                  ease: "easeInOut",
                 }}
-              >
-                <Brain className="w-32 h-32 lg:w-40 lg:h-40 text-blue-400" />
-                
-                {/* Pulsing connections */}
-                {[...Array(8)].map((_, i) => (
-                  <motion.div
+              />
+
+              {/* Central Brain Icon */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <motion.div
+                  className="relative bg-white/80 backdrop-blur-sm rounded-full p-8 shadow-xl border border-gray-200/50"
+                  animate={{
+                    rotateY: [0, 360],
+                  }}
+                  transition={{
+                    duration: 20,
+                    repeat: Infinity,
+                    ease: "linear",
+                  }}
+                  whileHover={{
+                    scale: 1.05,
+                    transition: { duration: 0.3 }
+                  }}
+                >
+                  <Brain className="w-24 h-24 lg:w-32 lg:h-32 text-blue-600" />
+                  
+                  {/* Pulsing Dots Around Brain */}
+                  {[...Array(8)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className="absolute w-3 h-3 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-full"
+                      style={{
+                        left: `${50 + 45 * Math.cos((i * Math.PI * 2) / 8)}%`,
+                        top: `${50 + 45 * Math.sin((i * Math.PI * 2) / 8)}%`,
+                        transform: 'translate(-50%, -50%)',
+                      }}
+                      animate={{
+                        scale: [1, 1.5, 1],
+                        opacity: [0.4, 1, 0.4],
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        delay: i * 0.25,
+                      }}
+                    />
+                  ))}
+                </motion.div>
+              </div>
+
+              {/* Orbiting Rings */}
+              <svg className="absolute inset-0 w-full h-full">
+                {[...Array(3)].map((_, i) => (
+                  <motion.circle
                     key={i}
-                    className="absolute w-3 h-3 bg-cyan-400 rounded-full"
-                    style={{
-                      left: `${50 + 40 * Math.cos((i * Math.PI * 2) / 8)}%`,
-                      top: `${50 + 40 * Math.sin((i * Math.PI * 2) / 8)}%`,
-                      transform: 'translate(-50%, -50%)',
-                    }}
-                    animate={{
-                      scale: [1, 1.5, 1],
-                      opacity: [0.5, 1, 0.5],
+                    cx="50%"
+                    cy="50%"
+                    r={80 + i * 30}
+                    fill="none"
+                    stroke="url(#orbitalGradient)"
+                    strokeWidth="2"
+                    strokeDasharray="8 8"
+                    opacity="0.4"
+                    initial={{ pathLength: 0 }}
+                    animate={{ 
+                      pathLength: 1, 
+                      rotate: i % 2 === 0 ? 360 : -360 
                     }}
                     transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      delay: i * 0.25,
+                      pathLength: { duration: 2, delay: i * 0.3 },
+                      rotate: { 
+                        duration: 15 + i * 5, 
+                        repeat: Infinity, 
+                        ease: "linear" 
+                      }
                     }}
                   />
                 ))}
-              </motion.div>
+                <defs>
+                  <linearGradient id="orbitalGradient">
+                    <stop offset="0%" stopColor="#60A5FA" stopOpacity="0.6" />
+                    <stop offset="50%" stopColor="#A78BFA" stopOpacity="0.8" />
+                    <stop offset="100%" stopColor="#3B82F6" stopOpacity="0.4" />
+                  </linearGradient>
+                </defs>
+              </svg>
             </div>
-
-            {/* Data flow visualization */}
-            <svg className="absolute inset-0 w-full h-full">
-              {[...Array(6)].map((_, i) => (
-                <motion.circle
-                  key={i}
-                  cx="50%"
-                  cy="50%"
-                  r={60 + i * 20}
-                  fill="none"
-                  stroke="url(#radialGradient)"
-                  strokeWidth="1"
-                  strokeDasharray="4 4"
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1, rotate: 360 }}
-                  transition={{
-                    pathLength: { duration: 2, delay: i * 0.2 },
-                    rotate: { duration: 10 + i * 2, repeat: Infinity, ease: "linear" }
-                  }}
-                />
-              ))}
-              <defs>
-                <radialGradient id="radialGradient">
-                  <stop offset="0%" stopColor="#60A5FA" stopOpacity="0.8" />
-                  <stop offset="100%" stopColor="#3B82F6" stopOpacity="0.2" />
-                </radialGradient>
-              </defs>
-            </svg>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
       </div>
 
-      {/* Scroll indicator */}
+      {/* Scroll Indicator */}
       <motion.div
         className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
         initial={{ opacity: 0, y: 20 }}
@@ -384,13 +298,13 @@ const Hero: React.FC<HeroProps> = ({ onCreatePod }) => {
         transition={{ duration: 0.8, delay: 1.2 }}
       >
         <motion.div
-          className="w-6 h-10 border-2 border-blue-400 rounded-full flex justify-center"
-          animate={{ y: [0, 10, 0] }}
+          className="w-6 h-10 border-2 border-gray-400/60 rounded-full flex justify-center bg-white/20 backdrop-blur-sm"
+          animate={{ y: [0, 8, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
         >
           <motion.div
-            className="w-1 h-3 bg-blue-400 rounded-full mt-2"
-            animate={{ opacity: [1, 0, 1] }}
+            className="w-1 h-3 bg-gray-500 rounded-full mt-2"
+            animate={{ opacity: [1, 0.3, 1] }}
             transition={{ duration: 2, repeat: Infinity }}
           />
         </motion.div>
