@@ -228,7 +228,7 @@ const Hero: React.FC<HeroProps> = ({ onCreatePod }) => {
             />
 
             {/* Button content */}
-            <span className="relative z-10 mr-2">Start Learning Now</span>
+            <span className="relative z-10 mr-2">Create New Pod</span>
             <ArrowRight className="relative z-10 w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
             
             {/* Button glow effect */}
