@@ -1,16 +1,17 @@
 import React, { memo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Play, Calendar, Eye } from 'lucide-react';
+import { Play, Calendar, Eye, Users, Heart, CheckCircle, Clock, Upload, AlertCircle } from 'lucide-react';
 import { Pod } from '../types';
 
 interface PodCardProps {
   pod: Pod;
   onClick: (pod: Pod) => void;
+  onToggleFollow?: (podId: string) => void;
   animationDelay?: number;
   isClicked?: boolean;
 }
 
-const PodCard: React.FC<PodCardProps> = memo(({ pod, onClick, animationDelay = 0, isClicked = false }) => {
+const PodCard: React.FC<PodCardProps> = memo(({ pod, onClick, onToggleFollow, animationDelay = 0, isClicked = false }) => {
   const prefersReducedMotion = useReducedMotion();
 
   const formatDate = (date: Date) => {
@@ -21,10 +22,49 @@ const PodCard: React.FC<PodCardProps> = memo(({ pod, onClick, animationDelay = 0
     });
   };
 
+  const getStatusConfig = (status: Pod['status']) => {
+    switch (status) {
+      case 'ready':
+        return {
+          icon: CheckCircle,
+          text: 'Ready',
+          color: 'bg-green-500/90 text-white',
+          dotColor: 'bg-green-400'
+        };
+      case 'processing':
+        return {
+          icon: Clock,
+          text: 'Processing',
+          color: 'bg-yellow-500/90 text-white',
+          dotColor: 'bg-yellow-400'
+        };
+      case 'uploading':
+        return {
+          icon: Upload,
+          text: 'Uploading',
+          color: 'bg-blue-500/90 text-white',
+          dotColor: 'bg-blue-400'
+        };
+      case 'error':
+        return {
+          icon: AlertCircle,
+          text: 'Error',
+          color: 'bg-red-500/90 text-white',
+          dotColor: 'bg-red-400'
+        };
+    }
+  };
+
   // Performance optimization: Memoize click handler
   const handleClick = React.useCallback(() => {
     onClick(pod);
   }, [onClick, pod]);
+
+  // Handle follow toggle
+  const handleFollowClick = React.useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    onToggleFollow?.(pod.id);
+  }, [onToggleFollow, pod.id]);
 
   // Enhanced animations for opening effect
   const getCardAnimations = () => {
@@ -55,6 +95,9 @@ const PodCard: React.FC<PodCardProps> = memo(({ pod, onClick, animationDelay = 0
       whileTap: { scale: 0.98 }
     };
   };
+
+  const statusConfig = getStatusConfig(pod.status);
+  const StatusIcon = statusConfig.icon;
 
   return (
     <motion.div
@@ -118,29 +161,39 @@ const PodCard: React.FC<PodCardProps> = memo(({ pod, onClick, animationDelay = 0
           </motion.div>
         </motion.div>
 
-        {/* Category Badge */}
+        {/* Status Badge */}
         <motion.div
           className="absolute top-4 left-4"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: animationDelay + 0.2, duration: 0.4 }}
         >
-          <span className="px-3 py-1 bg-blue-600/90 backdrop-blur-sm text-white text-sm font-medium rounded-full shadow-lg">
-            {pod.category}
-          </span>
+          <div className={`flex items-center px-3 py-1 ${statusConfig.color} backdrop-blur-sm text-sm font-medium rounded-full shadow-lg`}>
+            <StatusIcon className="w-3 h-3 mr-1" />
+            {statusConfig.text}
+          </div>
         </motion.div>
 
-        {/* Interaction Count Badge */}
+        {/* Follow Button */}
         <motion.div
-          className="absolute top-4 right-4 opacity-0 group-hover:opacity-100"
+          className="absolute top-4 right-4"
           initial={{ opacity: 0, x: 20 }}
-          whileHover={prefersReducedMotion ? undefined : { opacity: 1, x: 0 }}
+          animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <div className="flex items-center px-2 py-1 bg-black/50 backdrop-blur-sm text-white text-xs rounded-full">
-            <Eye className="w-3 h-3 mr-1" />
-            {pod.interactions}
-          </div>
+          <motion.button
+            onClick={handleFollowClick}
+            className={`flex items-center px-3 py-1 backdrop-blur-sm text-xs font-medium rounded-full shadow-lg transition-all duration-200 ${
+              pod.isFollowing 
+                ? 'bg-red-500/90 text-white hover:bg-red-600/90' 
+                : 'bg-white/90 text-gray-700 hover:bg-blue-50/90 hover:text-blue-700'
+            }`}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Heart className={`w-3 h-3 mr-1 ${pod.isFollowing ? 'fill-current' : ''}`} />
+            {pod.isFollowing ? 'Following' : 'Follow'}
+          </motion.button>
         </motion.div>
       </div>
 
@@ -172,24 +225,31 @@ const PodCard: React.FC<PodCardProps> = memo(({ pod, onClick, animationDelay = 0
 
         {/* Meta Information */}
         <motion.div
-          className="flex items-center justify-between text-xs text-gray-500"
+          className="flex items-center justify-between text-xs text-gray-500 space-y-2"
           initial={{ opacity: 0, y: 5 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: animationDelay + 0.3, duration: 0.4 }}
         >
-          <div className="flex items-center group-hover:text-blue-600 transition-colors duration-200">
-            <Calendar className="w-3 h-3 mr-1" />
-            <span className="font-medium">{formatDate(pod.createdAt)}</span>
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center group-hover:text-blue-600 transition-colors duration-200">
+              <Calendar className="w-3 h-3 mr-1" />
+              <span className="font-medium">{formatDate(pod.createdAt)}</span>
+            </div>
+            
+            <div className="flex items-center space-x-3">
+              {/* Followers Count */}
+              <div className="flex items-center text-gray-500">
+                <Users className="w-3 h-3 mr-1" />
+                <span className="font-medium">{pod.followers}</span>
+              </div>
+              
+              {/* Interactions Count */}
+              <div className="flex items-center text-gray-500">
+                <Eye className="w-3 h-3 mr-1" />
+                <span className="font-medium">{pod.interactions}</span>
+              </div>
+            </div>
           </div>
-          
-          <motion.div
-            className="flex items-center space-x-1"
-            whileHover={prefersReducedMotion ? undefined : { scale: 1.05 }}
-            transition={{ duration: 0.2 }}
-          >
-            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-            <span className="font-medium">Ready</span>
-          </motion.div>
         </motion.div>
       </motion.div>
 

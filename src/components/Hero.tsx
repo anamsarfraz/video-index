@@ -101,11 +101,11 @@ const Hero: React.FC<HeroProps> = ({ onCreatePod }) => {
             >
               <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
                 <span className="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 bg-clip-text text-transparent">
-                  Transform Videos Into
+                  Learn Smarter
                 </span>
                 <br />
                 <span className="text-gray-800">
-                  Interactive Learning
+                  With AI
                 </span>
               </h1>
               
@@ -115,7 +115,7 @@ const Hero: React.FC<HeroProps> = ({ onCreatePod }) => {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.5 }}
               >
-                AI-powered video analysis with instant Q&A and smart insights for enhanced learning.
+                Transform videos into interactive learning experiences.
               </motion.p>
             </motion.div>
 

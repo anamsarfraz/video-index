@@ -12,7 +12,10 @@ export const mockPods: Pod[] = [
       'https://www.youtube.com/watch?v=example2'
     ],
     createdAt: new Date('2024-01-15'),
-    interactions: 142
+    interactions: 142,
+    followers: 89,
+    status: 'ready',
+    isFollowing: false
   },
   {
     id: '2',
@@ -24,7 +27,10 @@ export const mockPods: Pod[] = [
       'https://www.youtube.com/watch?v=example3'
     ],
     createdAt: new Date('2024-01-10'),
-    interactions: 89
+    interactions: 89,
+    followers: 156,
+    status: 'processing',
+    isFollowing: true
   },
   {
     id: '3',
@@ -37,7 +43,10 @@ export const mockPods: Pod[] = [
       'https://www.youtube.com/watch?v=example5'
     ],
     createdAt: new Date('2024-01-08'),
-    interactions: 203
+    interactions: 203,
+    followers: 234,
+    status: 'ready',
+    isFollowing: false
   },
   {
     id: '4',
@@ -49,7 +58,10 @@ export const mockPods: Pod[] = [
       'https://www.youtube.com/watch?v=example6'
     ],
     createdAt: new Date('2024-01-05'),
-    interactions: 156
+    interactions: 156,
+    followers: 67,
+    status: 'uploading',
+    isFollowing: true
   },
   {
     id: '5',
@@ -62,7 +74,10 @@ export const mockPods: Pod[] = [
       'https://www.youtube.com/watch?v=example8'
     ],
     createdAt: new Date('2024-01-03'),
-    interactions: 187
+    interactions: 187,
+    followers: 198,
+    status: 'ready',
+    isFollowing: false
   },
   {
     id: '6',
@@ -74,7 +89,10 @@ export const mockPods: Pod[] = [
       'https://www.youtube.com/watch?v=example9'
     ],
     createdAt: new Date('2024-01-01'),
-    interactions: 94
+    interactions: 94,
+    followers: 45,
+    status: 'error',
+    isFollowing: false
   }
 ];
 

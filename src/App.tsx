@@ -94,6 +94,21 @@ function App() {
     setFilterOption(filter);
   };
 
+  // Handle pod following
+  const handleToggleFollow = (podId: string) => {
+    setPods(prev => 
+      prev.map(pod => 
+        pod.id === podId 
+          ? { 
+              ...pod, 
+              isFollowing: !pod.isFollowing,
+              followers: pod.isFollowing ? pod.followers - 1 : pod.followers + 1
+            }
+          : pod
+      )
+    );
+  };
+
   // Add function to show hero section
   const handleShowHero = () => {
     setShowHero(true);
@@ -151,6 +166,7 @@ function App() {
             <PodGrid
               pods={filteredPods}
               onPodClick={handlePodClick}
+              onToggleFollow={handleToggleFollow}
             />
           </motion.div>
         ) : (

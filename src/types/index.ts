@@ -7,6 +7,9 @@ export interface Pod {
   urls: string[];
   createdAt: Date;
   interactions: number;
+  followers: number;
+  status: 'ready' | 'processing' | 'uploading' | 'error';
+  isFollowing?: boolean;
 }
 
 export interface ChatMessage {
