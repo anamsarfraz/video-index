@@ -101,11 +101,11 @@ const Hero: React.FC<HeroProps> = ({ onCreatePod }) => {
             >
               <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
                 <span className="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 bg-clip-text text-transparent">
-                  Learn Smarter
+                  Transform Videos Into
                 </span>
                 <br />
                 <span className="text-gray-800">
-                  With AI
+                  Interactive Learning
                 </span>
               </h1>
               
@@ -115,7 +115,7 @@ const Hero: React.FC<HeroProps> = ({ onCreatePod }) => {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.5 }}
               >
-                Turn videos into interactive learning with instant Q&A and smart insights.
+                AI-powered video analysis with instant Q&A and smart insights for enhanced learning.
               </motion.p>
             </motion.div>
 
@@ -146,39 +146,6 @@ const Hero: React.FC<HeroProps> = ({ onCreatePod }) => {
               ))}
             </motion.div>
 
-            {/* CTA Button */}
-            <motion.div
-              className="pt-4"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.9 }}
-            >
-              <motion.button
-                onClick={onCreatePod}
-                className="group relative inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white font-semibold text-lg rounded-2xl shadow-lg overflow-hidden"
-                whileHover={{ 
-                  scale: 1.05,
-                  boxShadow: "0 20px 40px -12px rgba(59, 130, 246, 0.4)",
-                  transition: { duration: 0.3 }
-                }}
-                whileTap={{ scale: 0.98 }}
-              >
-                {/* Animated background */}
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 opacity-0 group-hover:opacity-100"
-                  transition={{ duration: 0.3 }}
-                />
-                
-                {/* Shimmer effect */}
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%]"
-                  transition={{ duration: 0.8, ease: "easeInOut" }}
-                />
-                
-                <span className="relative z-10 mr-2">Create Your First Pod</span>
-                <ArrowRight className="relative z-10 w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
-              </motion.button>
-            </motion.div>
           </motion.div>
 
           {/* Right Column - Visual Element */}
