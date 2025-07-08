@@ -15,56 +15,85 @@ const VideoIndexLogo: React.FC<{ className?: string }> = ({ className = "w-24 h-
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      {/* Outer Ring - Represents Learning Circle */}
-      <circle
-        cx="60"
-        cy="60"
-        r="55"
+      {/* Video Frame Container */}
+      <rect
+        x="20"
+        y="35"
+        width="80"
+        height="50"
+        rx="8"
+        ry="8"
+        fill="url(#videoFrameGradient)"
         stroke="url(#logoGradient1)"
-        strokeWidth="3"
-        fill="none"
-        opacity="0.8"
-      />
-      
-      {/* Inner Ring - AI Processing */}
-      <circle
-        cx="60"
-        cy="60"
-        r="42"
-        stroke="url(#logoGradient2)"
         strokeWidth="2"
-        fill="none"
-        opacity="0.6"
-        strokeDasharray="8 4"
+        className="drop-shadow-lg"
       />
       
-      {/* Central Play Button - Video Focus */}
+      {/* Video Screen */}
+      <rect
+        x="25"
+        y="40"
+        width="70"
+        height="40"
+        rx="4"
+        ry="4"
+        fill="url(#screenGradient)"
+      />
+      
+      {/* Play Button in Video */}
       <circle
         cx="60"
         cy="60"
-        r="28"
-        fill="url(#logoGradient3)"
-        className="drop-shadow-lg"
+        r="12"
+        fill="rgba(255, 255, 255, 0.9)"
+        className="drop-shadow-sm"
       />
       
       {/* Play Triangle */}
       <path
-        d="M52 45 L52 75 L78 60 Z"
-        fill="white"
-        className="drop-shadow-sm"
+        d="M56 54 L56 66 L68 60 Z"
+        fill="url(#logoGradient1)"
       />
       
-      {/* AI Neural Network Dots */}
-      <circle cx="35" cy="35" r="3" fill="url(#logoGradient1)" opacity="0.7" />
-      <circle cx="85" cy="35" r="3" fill="url(#logoGradient1)" opacity="0.7" />
-      <circle cx="35" cy="85" r="3" fill="url(#logoGradient1)" opacity="0.7" />
-      <circle cx="85" cy="85" r="3" fill="url(#logoGradient1)" opacity="0.7" />
+      {/* AI Brain/Network Above Video */}
+      <g transform="translate(60, 25)">
+        {/* Central AI Node */}
+        <circle
+          cx="0"
+          cy="0"
+          r="6"
+          fill="url(#aiGradient)"
+          className="drop-shadow-sm"
+        />
+        
+        {/* AI Network Nodes */}
+        <circle cx="-15" cy="-8" r="3" fill="url(#logoGradient2)" opacity="0.8" />
+        <circle cx="15" cy="-8" r="3" fill="url(#logoGradient2)" opacity="0.8" />
+        <circle cx="-10" cy="8" r="3" fill="url(#logoGradient2)" opacity="0.8" />
+        <circle cx="10" cy="8" r="3" fill="url(#logoGradient2)" opacity="0.8" />
+        
+        {/* Neural Connections */}
+        <line x1="0" y1="0" x2="-15" y2="-8" stroke="url(#logoGradient2)" strokeWidth="1.5" opacity="0.6" />
+        <line x1="0" y1="0" x2="15" y2="-8" stroke="url(#logoGradient2)" strokeWidth="1.5" opacity="0.6" />
+        <line x1="0" y1="0" x2="-10" y2="8" stroke="url(#logoGradient2)" strokeWidth="1.5" opacity="0.6" />
+        <line x1="0" y1="0" x2="10" y2="8" stroke="url(#logoGradient2)" strokeWidth="1.5" opacity="0.6" />
+      </g>
       
-      {/* Connecting Lines - Neural Network */}
-      <line x1="35" y1="35" x2="52" y2="52" stroke="url(#logoGradient2)" strokeWidth="1.5" opacity="0.5" />
-      <line x1="85" y1="35" x2="68" y2="52" stroke="url(#logoGradient2)" strokeWidth="1.5" opacity="0.5" />
-      <line x1="35" y1="85" x2="52" y2="68" stroke="url(#logoGradient2)" strokeWidth="1.5" opacity="0.5" />
-      <line x1="85" y1="85" x2="68" y2="68" stroke="url(#logoGradient2)" strokeWidth="1.5" opacity="0.5" />
+      {/* Learning Progress Indicators */}
+      <g transform="translate(60, 95)">
+        {/* Progress Dots */}
+        <circle cx="-20" cy="0" r="2.5" fill="url(#logoGradient1)" opacity="0.9" />
+        <circle cx="-10" cy="0" r="2.5" fill="url(#logoGradient1)" opacity="0.7" />
+        <circle cx="0" cy="0" r="2.5" fill="url(#logoGradient1)" opacity="0.5" />
+        <circle cx="10" cy="0" r="2.5" fill="url(#logoGradient2)" opacity="0.3" />
+        <circle cx="20" cy="0" r="2.5" fill="url(#logoGradient2)" opacity="0.2" />
+      </g>
+      
+      {/* Knowledge Particles */}
+      <circle cx="25" cy="25" r="1.5" fill="url(#logoGradient1)" opacity="0.6" />
+      <circle cx="95" cy="30" r="1.5" fill="url(#logoGradient2)" opacity="0.6" />
+      <circle cx="30" cy="95" r="1.5" fill="url(#logoGradient1)" opacity="0.6" />
+      <circle cx="90" cy="90" r="1.5" fill="url(#logoGradient2)" opacity="0.6" />
       
       {/* Gradient Definitions */}
       <defs>
@@ -79,7 +108,17 @@ const VideoIndexLogo: React.FC<{ className?: string }> = ({ className = "w-24 h-
           <stop offset="100%" stopColor="#3B82F6" />
         </linearGradient>
         
-        <radialGradient id="logoGradient3" cx="50%" cy="50%" r="50%">
+        <linearGradient id="videoFrameGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#F8FAFC" />
+          <stop offset="100%" stopColor="#E2E8F0" />
+        </linearGradient>
+        
+        <linearGradient id="screenGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#1E293B" />
+          <stop offset="100%" stopColor="#334155" />
+        </linearGradient>
+        
+        <radialGradient id="aiGradient" cx="50%" cy="50%" r="50%">
           <stop offset="0%" stopColor="#6366F1" />
           <stop offset="100%" stopColor="#3B82F6" />
         </radialGradient>
