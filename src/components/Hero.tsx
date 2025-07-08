@@ -67,11 +67,11 @@ const Hero: React.FC<HeroProps> = ({ onCreatePod }) => {
 
       {/* Content Container */}
       <div className="relative z-10 max-w-6xl mx-auto px-[4%] md:px-[6%] lg:px-[8%] xl:px-[10%] w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           
           {/* Left Column - Main Content */}
           <motion.div
-            className="text-center lg:text-left space-y-8"
+            className="text-center lg:text-left space-y-6 order-2 lg:order-1"
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
@@ -106,7 +106,7 @@ const Hero: React.FC<HeroProps> = ({ onCreatePod }) => {
               </h1>
               
               <motion.p
-                className="text-base md:text-lg lg:text-xl text-gray-600 leading-relaxed max-w-2xl whitespace-nowrap"
+                className="text-base md:text-lg lg:text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto lg:mx-0"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.5 }}
@@ -146,13 +146,13 @@ const Hero: React.FC<HeroProps> = ({ onCreatePod }) => {
 
           {/* Right Column - Visual Element */}
           <motion.div
-            className="relative flex items-center justify-center lg:scale-90"
+            className="relative flex items-center justify-center order-1 lg:order-2"
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
             {/* Main Visual Container */}
-            <div className="relative w-64 h-64 lg:w-80 lg:h-80">
+            <div className="relative w-48 h-48 md:w-64 md:h-64 lg:w-72 lg:h-72">
               
               {/* Outer Glow Ring */}
               <motion.div
@@ -185,13 +185,13 @@ const Hero: React.FC<HeroProps> = ({ onCreatePod }) => {
                     transition: { duration: 0.3 }
                   }}
                 >
-                  <GraduationCap className="w-24 h-24 lg:w-32 lg:h-32 text-blue-600" />
+                  <GraduationCap className="w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 text-blue-600" />
                   
                   {/* Pulsing Dots Around Icon */}
                   {[...Array(8)].map((_, i) => (
                     <motion.div
                       key={i}
-                      className="absolute w-2 h-2 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-full"
+                      className="absolute w-1.5 h-1.5 md:w-2 md:h-2 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-full"
                       style={{
                         left: `${50 + 45 * Math.cos((i * Math.PI * 2) / 8)}%`,
                         top: `${50 + 45 * Math.sin((i * Math.PI * 2) / 8)}%`,
@@ -218,7 +218,7 @@ const Hero: React.FC<HeroProps> = ({ onCreatePod }) => {
                     key={i}
                     cx="50%"
                     cy="50%"
-                    r={80 + i * 30}
+                    r={60 + i * 25}
                     fill="none"
                     stroke="url(#orbitalGradient)"
                     strokeWidth="2"
