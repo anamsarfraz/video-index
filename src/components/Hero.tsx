@@ -1,11 +1,92 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { GraduationCap, Zap, ArrowRight, Sparkles, Play, Users, Clock, BookOpen } from 'lucide-react';
+import { Zap, ArrowRight, Sparkles, Play, Users, Clock, BookOpen } from 'lucide-react';
 
 interface HeroProps {
   onCreatePod: () => void;
 }
 
+// Modern VideoIndex Logo Component
+const VideoIndexLogo: React.FC<{ className?: string }> = ({ className = "w-24 h-24" }) => {
+  return (
+    <svg
+      viewBox="0 0 120 120"
+      className={className}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      {/* Outer Ring - Represents Learning Circle */}
+      <circle
+        cx="60"
+        cy="60"
+        r="55"
+        stroke="url(#logoGradient1)"
+        strokeWidth="3"
+        fill="none"
+        opacity="0.8"
+      />
+      
+      {/* Inner Ring - AI Processing */}
+      <circle
+        cx="60"
+        cy="60"
+        r="42"
+        stroke="url(#logoGradient2)"
+        strokeWidth="2"
+        fill="none"
+        opacity="0.6"
+        strokeDasharray="8 4"
+      />
+      
+      {/* Central Play Button - Video Focus */}
+      <circle
+        cx="60"
+        cy="60"
+        r="28"
+        fill="url(#logoGradient3)"
+        className="drop-shadow-lg"
+      />
+      
+      {/* Play Triangle */}
+      <path
+        d="M52 45 L52 75 L78 60 Z"
+        fill="white"
+        className="drop-shadow-sm"
+      />
+      
+      {/* AI Neural Network Dots */}
+      <circle cx="35" cy="35" r="3" fill="url(#logoGradient1)" opacity="0.7" />
+      <circle cx="85" cy="35" r="3" fill="url(#logoGradient1)" opacity="0.7" />
+      <circle cx="35" cy="85" r="3" fill="url(#logoGradient1)" opacity="0.7" />
+      <circle cx="85" cy="85" r="3" fill="url(#logoGradient1)" opacity="0.7" />
+      
+      {/* Connecting Lines - Neural Network */}
+      <line x1="35" y1="35" x2="52" y2="52" stroke="url(#logoGradient2)" strokeWidth="1.5" opacity="0.5" />
+      <line x1="85" y1="35" x2="68" y2="52" stroke="url(#logoGradient2)" strokeWidth="1.5" opacity="0.5" />
+      <line x1="35" y1="85" x2="52" y2="68" stroke="url(#logoGradient2)" strokeWidth="1.5" opacity="0.5" />
+      <line x1="85" y1="85" x2="68" y2="68" stroke="url(#logoGradient2)" strokeWidth="1.5" opacity="0.5" />
+      
+      {/* Gradient Definitions */}
+      <defs>
+        <linearGradient id="logoGradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#3B82F6" />
+          <stop offset="50%" stopColor="#6366F1" />
+          <stop offset="100%" stopColor="#8B5CF6" />
+        </linearGradient>
+        
+        <linearGradient id="logoGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#06B6D4" />
+          <stop offset="100%" stopColor="#3B82F6" />
+        </linearGradient>
+        
+        <radialGradient id="logoGradient3" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#6366F1" />
+          <stop offset="100%" stopColor="#3B82F6" />
+        </radialGradient>
+      </defs>
+    </svg>
+  );
+};
 const Hero: React.FC<HeroProps> = ({ onCreatePod }) => {
   return (
     <section className="relative h-[60vh] lg:h-[65vh] flex items-center justify-center overflow-hidden">
@@ -185,7 +266,7 @@ const Hero: React.FC<HeroProps> = ({ onCreatePod }) => {
                     transition: { duration: 0.3 }
                   }}
                 >
-                  <GraduationCap className="w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 text-blue-600" />
+                  <VideoIndexLogo className="w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24" />
                   
                   {/* Pulsing Dots Around Icon */}
                   {[...Array(8)].map((_, i) => (
