@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Brain, Zap, ArrowRight, Sparkles, Play, Users, Clock } from 'lucide-react';
+import { GraduationCap, Zap, ArrowRight, Sparkles, Play, Users, Clock, BookOpen } from 'lucide-react';
 
 interface HeroProps {
   onCreatePod: () => void;
@@ -99,18 +99,14 @@ const Hero: React.FC<HeroProps> = ({ onCreatePod }) => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
             >
-              <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight whitespace-nowrap">
                 <span className="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 bg-clip-text text-transparent">
-                  Learn Smarter
-                </span>
-                <br />
-                <span className="text-gray-800">
-                  With AI
+                  Learn Smarter With AI
                 </span>
               </h1>
               
               <motion.p
-                className="text-base md:text-lg lg:text-xl text-gray-600 leading-relaxed max-w-2xl"
+                className="text-base md:text-lg lg:text-xl text-gray-600 leading-relaxed max-w-2xl whitespace-nowrap"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.5 }}
@@ -127,7 +123,7 @@ const Hero: React.FC<HeroProps> = ({ onCreatePod }) => {
               transition={{ duration: 0.8, delay: 0.7 }}
             >
               {[
-                { icon: Brain, text: "AI-Powered Analysis" },
+                { icon: BookOpen, text: "AI-Powered Analysis" },
                 { icon: Clock, text: "Instant Responses" },
                 { icon: Users, text: "Collaborative Learning" }
               ].map((feature, index) => (
@@ -189,9 +185,9 @@ const Hero: React.FC<HeroProps> = ({ onCreatePod }) => {
                     transition: { duration: 0.3 }
                   }}
                 >
-                  <Brain className="w-24 h-24 lg:w-32 lg:h-32 text-blue-600" />
+                  <GraduationCap className="w-24 h-24 lg:w-32 lg:h-32 text-blue-600" />
                   
-                  {/* Pulsing Dots Around Brain */}
+                  {/* Pulsing Dots Around Icon */}
                   {[...Array(8)].map((_, i) => (
                     <motion.div
                       key={i}
