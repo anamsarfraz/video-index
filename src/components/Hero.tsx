@@ -8,7 +8,7 @@ interface HeroProps {
 
 const Hero: React.FC<HeroProps> = ({ onCreatePod }) => {
   return (
-    <section className="relative h-[80vh] flex items-center justify-center overflow-hidden">
+    <section className="relative h-[60vh] lg:h-[65vh] flex items-center justify-center overflow-hidden">
       {/* Animated Light Gradient Background */}
       <motion.div
         className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50"
@@ -66,7 +66,7 @@ const Hero: React.FC<HeroProps> = ({ onCreatePod }) => {
       </div>
 
       {/* Content Container */}
-      <div className="relative z-10 max-w-7xl mx-auto px-[4%] md:px-[6%] lg:px-[8%] xl:px-[10%] w-full">
+      <div className="relative z-10 max-w-6xl mx-auto px-[4%] md:px-[6%] lg:px-[8%] xl:px-[10%] w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           
           {/* Left Column - Main Content */}
@@ -94,12 +94,12 @@ const Hero: React.FC<HeroProps> = ({ onCreatePod }) => {
 
             {/* Main Headline */}
             <motion.div
-              className="space-y-4"
+              className="space-y-3"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
             >
-              <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight">
                 <span className="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 bg-clip-text text-transparent">
                   Learn Smarter
                 </span>
@@ -110,7 +110,7 @@ const Hero: React.FC<HeroProps> = ({ onCreatePod }) => {
               </h1>
               
               <motion.p
-                className="text-lg md:text-xl lg:text-2xl text-gray-600 leading-relaxed max-w-2xl"
+                className="text-base md:text-lg lg:text-xl text-gray-600 leading-relaxed max-w-2xl"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.5 }}
@@ -121,7 +121,7 @@ const Hero: React.FC<HeroProps> = ({ onCreatePod }) => {
 
             {/* Feature Highlights */}
             <motion.div
-              className="flex flex-wrap gap-6 justify-center lg:justify-start text-sm text-gray-600"
+              className="flex flex-wrap gap-4 justify-center lg:justify-start text-sm text-gray-600"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.7 }}
@@ -150,13 +150,13 @@ const Hero: React.FC<HeroProps> = ({ onCreatePod }) => {
 
           {/* Right Column - Visual Element */}
           <motion.div
-            className="relative flex items-center justify-center"
+            className="relative flex items-center justify-center lg:scale-90"
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
             {/* Main Visual Container */}
-            <div className="relative w-80 h-80 lg:w-96 lg:h-96">
+            <div className="relative w-64 h-64 lg:w-80 lg:h-80">
               
               {/* Outer Glow Ring */}
               <motion.div
@@ -195,7 +195,7 @@ const Hero: React.FC<HeroProps> = ({ onCreatePod }) => {
                   {[...Array(8)].map((_, i) => (
                     <motion.div
                       key={i}
-                      className="absolute w-3 h-3 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-full"
+                      className="absolute w-2 h-2 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-full"
                       style={{
                         left: `${50 + 45 * Math.cos((i * Math.PI * 2) / 8)}%`,
                         top: `${50 + 45 * Math.sin((i * Math.PI * 2) / 8)}%`,
@@ -258,18 +258,18 @@ const Hero: React.FC<HeroProps> = ({ onCreatePod }) => {
 
       {/* Scroll Indicator */}
       <motion.div
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+        className="absolute bottom-4 left-1/2 transform -translate-x-1/2"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 1.2 }}
       >
         <motion.div
-          className="w-6 h-10 border-2 border-gray-400/60 rounded-full flex justify-center bg-white/20 backdrop-blur-sm"
-          animate={{ y: [0, 8, 0] }}
+          className="w-5 h-8 border-2 border-gray-400/60 rounded-full flex justify-center bg-white/20 backdrop-blur-sm"
+          animate={{ y: [0, 6, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
         >
           <motion.div
-            className="w-1 h-3 bg-gray-500 rounded-full mt-2"
+            className="w-1 h-2 bg-gray-500 rounded-full mt-1.5"
             animate={{ opacity: [1, 0.3, 1] }}
             transition={{ duration: 2, repeat: Infinity }}
           />
