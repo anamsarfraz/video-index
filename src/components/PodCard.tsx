@@ -1,17 +1,18 @@
 import React, { memo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Play, Calendar, Eye, Users, Heart, CheckCircle, Clock, Upload, AlertCircle } from 'lucide-react';
+import { Play, Calendar, Eye, Users, Heart, CheckCircle, Clock, Upload, AlertCircle, Share2 } from 'lucide-react';
 import { Pod } from '../types';
 
 interface PodCardProps {
   pod: Pod;
   onClick: (pod: Pod) => void;
   onToggleFollow?: (podId: string) => void;
+  onShare?: (pod: Pod) => void;
   animationDelay?: number;
   isClicked?: boolean;
 }
 
-const PodCard: React.FC<PodCardProps> = memo(({ pod, onClick, onToggleFollow, animationDelay = 0, isClicked = false }) => {
+const PodCard: React.FC<PodCardProps> = memo(({ pod, onClick, onToggleFollow, onShare, animationDelay = 0, isClicked = false }) => {
   const prefersReducedMotion = useReducedMotion();
 
   const formatDate = (date: Date) => {
@@ -65,6 +66,12 @@ const PodCard: React.FC<PodCardProps> = memo(({ pod, onClick, onToggleFollow, an
     e.stopPropagation();
     onToggleFollow?.(pod.id);
   }, [onToggleFollow, pod.id]);
+
+  // Handle share click
+  const handleShareClick = React.useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    onShare?.(pod);
+  }, [onShare, pod]);
 
   // Enhanced animations for opening effect
   const getCardAnimations = () => {
@@ -176,11 +183,22 @@ const PodCard: React.FC<PodCardProps> = memo(({ pod, onClick, onToggleFollow, an
 
         {/* Follow Button */}
         <motion.div
-          className="absolute top-4 right-4"
+          className="absolute top-4 right-4 flex items-center space-x-2"
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3 }}
         >
+          {/* Share Button */}
+          <motion.button
+            onClick={handleShareClick}
+            className="flex items-center px-2 py-1 backdrop-blur-sm text-xs font-medium rounded-full shadow-lg transition-all duration-200 bg-white/90 text-gray-700 hover:bg-blue-50/90 hover:text-blue-700"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Share2 className="w-3 h-3" />
+          </motion.button>
+          
+          {/* Follow Button */}
           <motion.button
             onClick={handleFollowClick}
             className={`flex items-center px-3 py-1 backdrop-blur-sm text-xs font-medium rounded-full shadow-lg transition-all duration-200 ${

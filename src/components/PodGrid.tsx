@@ -8,9 +8,10 @@ interface PodGridProps {
   pods: Pod[];
   onPodClick: (pod: Pod) => void;
   onToggleFollow?: (podId: string) => void;
+  onShare?: (pod: Pod) => void;
 }
 
-const PodGrid: React.FC<PodGridProps> = ({ pods, onPodClick, onToggleFollow }) => {
+const PodGrid: React.FC<PodGridProps> = ({ pods, onPodClick, onToggleFollow, onShare }) => {
   const [visiblePods, setVisiblePods] = useState<Pod[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [clickedPodId, setClickedPodId] = useState<string | null>(null);
@@ -101,6 +102,7 @@ const PodGrid: React.FC<PodGridProps> = ({ pods, onPodClick, onToggleFollow }) =
                 pod={pod} 
                 onClick={handlePodClick}
                 onToggleFollow={onToggleFollow}
+                onShare={onShare}
                 animationDelay={prefersReducedMotion ? 0 : index * 0.05}
                 isClicked={clickedPodId === pod.id}
               />

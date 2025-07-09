@@ -9,6 +9,7 @@ import PodGrid from './components/PodGrid';
 import CreatePodModal from './components/CreatePodModal';
 import PodDetail from './components/PodDetail';
 import PerformanceDebugger from './components/PerformanceDebugger';
+import ShareModal from './components/ShareModal';
 
 type AppView = 'home' | 'pod-detail';
 
@@ -20,6 +21,7 @@ function App() {
   const [filterOption, setFilterOption] = useState('recent');
   const [showHero, setShowHero] = useState(true);
   const [showPerformanceDebugger, setShowPerformanceDebugger] = useState(false);
+  const [shareModalPod, setShareModalPod] = useState<Pod | null>(null);
   
   const { isOpen: isCreateModalOpen, openModal: openCreateModal, closeModal: closeCreateModal } = useModal();
 
@@ -116,6 +118,11 @@ function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Handle pod sharing
+  const handlePodShare = (pod: Pod) => {
+    setShareModalPod(pod);
+  };
+
   // Performance debugging toggle (for development)
   React.useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -167,6 +174,7 @@ function App() {
               pods={filteredPods}
               onPodClick={handlePodClick}
               onToggleFollow={handleToggleFollow}
+              onShare={handlePodShare}
             />
           </motion.div>
         ) : (
@@ -192,6 +200,13 @@ function App() {
         isOpen={isCreateModalOpen}
         onClose={closeCreateModal}
         onSubmit={handlePodSubmit}
+      />
+
+      {/* Share Modal */}
+      <ShareModal
+        isOpen={!!shareModalPod}
+        onClose={() => setShareModalPod(null)}
+        pod={shareModalPod!}
       />
     </div>
   );

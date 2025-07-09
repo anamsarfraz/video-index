@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ExternalLink } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Share2 } from 'lucide-react';
 import { Pod } from '../types';
 import { useChat } from '../hooks/useChat';
 import { mockChatMessages } from '../utils/mockData';
 import VideoPlayer from './VideoPlayer';
 import ChatInterface from './ChatInterface';
+import ShareModal from './ShareModal';
 
 interface PodDetailProps {
   pod: Pod;
@@ -14,10 +15,15 @@ interface PodDetailProps {
 
 const PodDetail: React.FC<PodDetailProps> = ({ pod, onBack }) => {
   const [jumpToTime, setJumpToTime] = useState<number | undefined>();
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const { messages, sendMessage, addFeedback, isLoading } = useChat(mockChatMessages);
 
   const handleJumpToTime = (time: number) => {
     setJumpToTime(time);
+  };
+
+  const handleShare = () => {
+    setIsShareModalOpen(true);
   };
 
   return (
@@ -40,6 +46,16 @@ const PodDetail: React.FC<PodDetailProps> = ({ pod, onBack }) => {
             </button>
             
             <div className="flex items-center space-x-2">
+              <motion.button
+                onClick={handleShare}
+                className="flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Share2 className="w-4 h-4 mr-2" />
+                Share
+              </motion.button>
+              
               <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
                 {pod.category}
               </span>
@@ -113,6 +129,13 @@ const PodDetail: React.FC<PodDetailProps> = ({ pod, onBack }) => {
           </div>
         </div>
       </div>
+
+      {/* Share Modal */}
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        pod={pod}
+      />
     </motion.div>
   );
 };
