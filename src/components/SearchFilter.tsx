@@ -42,30 +42,30 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onSearch, onFilter, onCreat
   };
   return (
     <motion.div
-      className="sticky top-0 z-40 bg-white/90 backdrop-blur-lg border-b border-gray-200/50 py-4 md:py-6"
+      className="sticky top-0 z-40 bg-white/95 backdrop-blur-xl border-b border-gray-200/60 py-6 md:py-8 shadow-sm"
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
     >
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-8xl mx-auto px-4">
         {/* Logo/Brand - Only show when hero is hidden */}
         {!showHero && (
           <motion.div
-            className="flex items-center justify-center mb-4"
+            className="flex items-center justify-center mb-6"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
             <button
               onClick={handleLogoClick}
-              className="flex items-center space-x-2 text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent hover:from-blue-500 hover:to-indigo-500 transition-all duration-300"
+              className="flex items-center space-x-3 text-3xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent hover:from-blue-500 hover:to-indigo-500 transition-all duration-300"
             >
               <motion.div
-                className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center"
+                className="w-10 h-10 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg"
                 whileHover={{ scale: 1.05, rotate: 5 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <span className="text-white font-bold text-sm">VI</span>
+                <span className="text-white font-bold">VI</span>
               </motion.div>
               <span>VideoIndex</span>
             </button>
@@ -148,25 +148,63 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onSearch, onFilter, onCreat
         {/* Desktop Layout */}
         <div className="hidden md:flex gap-6 items-center">
           {/* Search Bar */}
-          <div className="relative flex-1 max-w-2xl group">
+          <div className="relative flex-1 max-w-3xl group">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            
+            {/* Enhanced Search Input with Glow Effect */}
             <input
               type="text"
               placeholder="Search learning pods with AI precision..."
               value={searchQuery}
               onChange={handleSearchChange}
-              className="w-full pl-12 pr-4 py-3 bg-gray-50/80 backdrop-blur-sm border border-gray-200/60 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-gray-900 placeholder-gray-500 group-hover:bg-gray-100/80"
+              className="w-full pl-12 pr-16 py-4 bg-white/90 backdrop-blur-md border-2 border-gray-200/80 rounded-3xl focus:outline-none focus:ring-4 focus:ring-blue-500/30 focus:border-blue-500 hover:border-blue-300/60 transition-all duration-300 text-gray-900 placeholder-gray-500 shadow-lg hover:shadow-xl focus:shadow-2xl text-lg font-medium"
             />
-            {/* Search enhancement effects */}
-            <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500/5 to-indigo-500/5 opacity-0 focus-within:opacity-100 transition-opacity duration-300 pointer-events-none" />
+            
+            {/* Animated Search Glow */}
+            <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-purple-500/10 opacity-0 group-focus-within:opacity-100 transition-all duration-500 pointer-events-none blur-sm" />
+            
+            {/* Search Enhancement Icon */}
             <motion.div
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 opacity-0 group-focus-within:opacity-100"
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.2 }}
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 opacity-0 group-focus-within:opacity-100 transition-all duration-300"
+              initial={{ scale: 0, rotate: 0 }}
+              animate={{ 
+                scale: searchQuery ? 1 : 0,
+                rotate: searchQuery ? 360 : 0
+              }}
+              transition={{ duration: 0.4, type: "spring" }}
             >
-              <Sparkles className="w-4 h-4 text-blue-500" />
+              <div className="relative">
+                <Sparkles className="w-5 h-5 text-blue-500" />
+                <motion.div
+                  className="absolute inset-0"
+                  animate={{
+                    scale: [1, 1.2, 1],
+                    opacity: [0.5, 1, 0.5],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                >
+                  <Sparkles className="w-5 h-5 text-indigo-400" />
+                </motion.div>
+              </div>
             </motion.div>
+            
+            {/* Floating Search Suggestions Hint */}
+            {!searchQuery && (
+              <motion.div
+                className="absolute right-16 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300"
+                initial={{ x: 10, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="flex items-center space-x-1 text-xs text-gray-400 bg-white/80 px-2 py-1 rounded-full">
+                  <span>Try "React" or "JavaScript"</span>
+                </div>
+              </motion.div>
+            )}
           </div>
 
           {/* Filter Dropdown */}

@@ -128,7 +128,7 @@ const VideoIndexLogo: React.FC<{ className?: string }> = ({ className = "w-24 h-
 };
 const Hero: React.FC<HeroProps> = ({ onCreatePod }) => {
   return (
-    <section className="relative h-[60vh] lg:h-[65vh] flex items-center justify-center overflow-hidden">
+    <section className="relative h-[45vh] lg:h-[50vh] flex items-center justify-center overflow-hidden">
       {/* Animated Light Gradient Background */}
       <motion.div
         className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50"
