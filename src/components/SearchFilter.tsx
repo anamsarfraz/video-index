@@ -250,7 +250,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onSearch, onFilter, onCreat
           {/* Create Pod Button */}
           <motion.button
             onClick={onCreatePod}
-            className="group relative flex items-center px-8 py-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white font-semibold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl overflow-hidden"
+            className="group relative flex items-center px-12 py-5 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white font-bold rounded-3xl transition-all duration-300 shadow-xl hover:shadow-2xl overflow-hidden text-lg"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -269,7 +269,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onSearch, onFilter, onCreat
                 backgroundSize: '200% 100%',
               }}
             />
-            <Plus className="relative z-10 w-5 h-5 mr-2 group-hover:rotate-90 transition-transform duration-200" />
+            <Plus className="relative z-10 w-6 h-6 mr-3 group-hover:rotate-90 transition-transform duration-200" />
             <span className="relative z-10">Create Pod</span>
           </motion.button>
         </div>
