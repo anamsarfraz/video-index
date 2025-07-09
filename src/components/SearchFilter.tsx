@@ -151,14 +151,22 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onSearch, onFilter, onCreat
           <div className="relative flex-1 max-w-3xl group">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             
-            {/* Enhanced Search Input with Glow Effect */}
-            <input
-              type="text"
-              placeholder="Search learning pods with AI precision..."
-              value={searchQuery}
-              onChange={handleSearchChange}
-              className="w-full pl-12 pr-16 py-4 bg-white/90 backdrop-blur-md border-2 border-gray-200/80 rounded-3xl focus:outline-none focus:ring-4 focus:ring-blue-500/30 focus:border-blue-500 hover:border-blue-300/60 transition-all duration-300 text-gray-900 placeholder-gray-500 shadow-lg hover:shadow-xl focus:shadow-2xl text-lg font-medium"
-            />
+            {/* Enhanced Search Input with Gradient Border */}
+            <div className="relative">
+              {/* Gradient Border Background */}
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-3xl p-[2px] opacity-60 group-hover:opacity-80 group-focus-within:opacity-100 transition-all duration-300">
+                <div className="w-full h-full bg-white rounded-3xl"></div>
+              </div>
+              
+              {/* Search Input */}
+              <input
+                type="text"
+                placeholder="Search learning pods with AI precision..."
+                value={searchQuery}
+                onChange={handleSearchChange}
+                className="relative w-full pl-12 pr-16 py-4 bg-white/95 backdrop-blur-md rounded-3xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 text-gray-900 placeholder-gray-500 shadow-lg hover:shadow-xl focus:shadow-2xl text-lg font-medium border-0"
+              />
+            </div>
             
             {/* Animated Search Glow */}
             <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-purple-500/10 opacity-0 group-focus-within:opacity-100 transition-all duration-500 pointer-events-none blur-sm" />
