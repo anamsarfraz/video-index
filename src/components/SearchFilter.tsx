@@ -164,7 +164,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onSearch, onFilter, onCreat
                 placeholder="Search learning pods with AI precision..."
                 value={searchQuery}
                 onChange={handleSearchChange}
-                className="relative w-full pl-12 pr-16 py-4 bg-white/95 backdrop-blur-md rounded-3xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 text-gray-900 placeholder-gray-500 shadow-lg hover:shadow-xl focus:shadow-2xl text-lg font-medium border-0"
+                className="relative w-full pl-12 pr-16 py-4 bg-gradient-to-r from-blue-50/80 via-indigo-50/80 to-purple-50/80 backdrop-blur-md rounded-3xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:bg-gradient-to-r focus:from-blue-100/90 focus:via-indigo-100/90 focus:to-purple-100/90 hover:bg-gradient-to-r hover:from-blue-100/70 hover:via-indigo-100/70 hover:to-purple-100/70 transition-all duration-300 text-gray-900 placeholder-gray-500 shadow-lg hover:shadow-xl focus:shadow-2xl text-lg font-medium border-0"
               />
             </div>
             
