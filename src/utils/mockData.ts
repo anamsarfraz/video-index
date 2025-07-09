@@ -16,6 +16,9 @@ export const mockPods: Pod[] = [
     followers: 89,
     status: 'ready',
     isFollowing: false
+    followers: 89,
+    status: 'ready',
+    isFollowing: false
   },
   {
     id: '2',
@@ -28,6 +31,9 @@ export const mockPods: Pod[] = [
     ],
     createdAt: new Date('2024-01-10'),
     interactions: 89,
+    followers: 156,
+    status: 'processing',
+    isFollowing: true
     followers: 156,
     status: 'processing',
     isFollowing: true
@@ -47,6 +53,9 @@ export const mockPods: Pod[] = [
     followers: 234,
     status: 'ready',
     isFollowing: false
+    followers: 234,
+    status: 'ready',
+    isFollowing: false
   },
   {
     id: '4',
@@ -59,6 +68,9 @@ export const mockPods: Pod[] = [
     ],
     createdAt: new Date('2024-01-05'),
     interactions: 156,
+    followers: 67,
+    status: 'uploading',
+    isFollowing: true
     followers: 67,
     status: 'uploading',
     isFollowing: true
@@ -78,6 +90,9 @@ export const mockPods: Pod[] = [
     followers: 198,
     status: 'ready',
     isFollowing: false
+    followers: 198,
+    status: 'ready',
+    isFollowing: false
   },
   {
     id: '6',
@@ -90,6 +105,9 @@ export const mockPods: Pod[] = [
     ],
     createdAt: new Date('2024-01-01'),
     interactions: 94,
+    followers: 45,
+    status: 'error',
+    isFollowing: false
     followers: 45,
     status: 'error',
     isFollowing: false

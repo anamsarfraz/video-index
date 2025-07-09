@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { Routes, Route, useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Pod, CreatePodFormData } from './types';
 import { mockPods } from './utils/mockData';
@@ -11,16 +12,46 @@ import PodDetail from './components/PodDetail';
 import PerformanceDebugger from './components/PerformanceDebugger';
 import ShareModal from './components/ShareModal';
 
-type AppView = 'home' | 'pod-detail';
+// Shared Pod Page Component
+const SharedPodPage: React.FC = () => {
+  const { podId } = useParams<{ podId: string }>();
+  const navigate = useNavigate();
+  const [pods] = useState<Pod[]>(mockPods);
+  
+  const pod = pods.find(p => p.id === podId);
+  
+  if (!pod) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Pod Not Found</h1>
+          <p className="text-gray-600 mb-6">The pod you're looking for doesn't exist or has been removed.</p>
+          <button
+            onClick={() => navigate('/')}
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+          >
+            Go to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
+  
+  return (
+    <PodDetail
+      pod={pod}
+      onBack={() => navigate('/')}
+    />
+  );
+};
 
-function App() {
-  const [currentView, setCurrentView] = useState<AppView>('home');
-  const [selectedPod, setSelectedPod] = useState<Pod | null>(null);
+// Home Page Component
+const HomePage: React.FC = () => {
+  const navigate = useNavigate();
   const [pods, setPods] = useState<Pod[]>(mockPods);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterOption, setFilterOption] = useState('recent');
   const [showHero, setShowHero] = useState(true);
-  const [showPerformanceDebugger, setShowPerformanceDebugger] = useState(false);
   const [shareModalPod, setShareModalPod] = useState<Pod | null>(null);
   
   const { isOpen: isCreateModalOpen, openModal: openCreateModal, closeModal: closeCreateModal } = useModal();
@@ -65,7 +96,10 @@ function App() {
       category: 'General',
       urls: formData.urls,
       createdAt: new Date(),
-      interactions: 0
+      interactions: 0,
+      followers: Math.floor(Math.random() * 100),
+      status: 'ready',
+      isFollowing: false
     };
 
     setPods(prev => [newPod, ...prev]);
@@ -74,15 +108,7 @@ function App() {
   };
 
   const handlePodClick = (pod: Pod) => {
-    setSelectedPod(pod);
-    setCurrentView('pod-detail');
-  };
-
-  const handleBackToHome = () => {
-    setCurrentView('home');
-    setSelectedPod(null);
-    // Scroll to top to show hero section
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    navigate(`/pod/${pod.id}`);
   };
 
   const handleSearch = (query: string) => {
@@ -111,6 +137,11 @@ function App() {
     );
   };
 
+  // Handle pod sharing
+  const handlePodShare = (pod: Pod) => {
+    setShareModalPod(pod);
+  };
+
   // Add function to show hero section
   const handleShowHero = () => {
     setShowHero(true);
@@ -118,82 +149,37 @@ function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Handle pod sharing
-  const handlePodShare = (pod: Pod) => {
-    setShareModalPod(pod);
-  };
-
-  // Performance debugging toggle (for development)
-  React.useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.shiftKey && e.key === 'P') {
-        setShowPerformanceDebugger(prev => !prev);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, []);
   return (
-    <div className="min-h-screen bg-gray-50">
-      <PerformanceDebugger enabled={showPerformanceDebugger} />
-      
-      <AnimatePresence mode="wait">
-        {currentView === 'home' ? (
+    <>
+      {/* Hero Section */}
+      <AnimatePresence>
+        {showHero && (
           <motion.div
-            key="home"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            initial={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.5 }}
           >
-            {/* Hero Section */}
-            <AnimatePresence>
-              {showHero && (
-                <motion.div
-                  initial={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <Hero onCreatePod={handleCreatePod} />
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Search and Filter */}
-            <SearchFilter
-              onSearch={handleSearch}
-              onFilter={handleFilter}
-              onCreatePod={handleCreatePod}
-              onShowHero={handleShowHero}
-              showHero={showHero}
-            />
-
-            {/* Pod Grid */}
-            <PodGrid
-              pods={filteredPods}
-              onPodClick={handlePodClick}
-              onToggleFollow={handleToggleFollow}
-              onShare={handlePodShare}
-            />
-          </motion.div>
-        ) : (
-          <motion.div
-            key="pod-detail"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            {selectedPod && (
-              <PodDetail
-                pod={selectedPod}
-                onBack={handleBackToHome}
-              />
-            )}
+            <Hero onCreatePod={handleCreatePod} />
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Search and Filter */}
+      <SearchFilter
+        onSearch={handleSearch}
+        onFilter={handleFilter}
+        onCreatePod={handleCreatePod}
+        onShowHero={handleShowHero}
+        showHero={showHero}
+      />
+
+      {/* Pod Grid */}
+      <PodGrid
+        pods={filteredPods}
+        onPodClick={handlePodClick}
+        onToggleFollow={handleToggleFollow}
+        onShare={handlePodShare}
+      />
 
       {/* Create Pod Modal */}
       <CreatePodModal
@@ -208,6 +194,33 @@ function App() {
         onClose={() => setShareModalPod(null)}
         pod={shareModalPod!}
       />
+    </>
+  );
+};
+
+function App() {
+  const [showPerformanceDebugger, setShowPerformanceDebugger] = useState(false);
+
+  // Performance debugging toggle (for development)
+  React.useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'P') {
+        setShowPerformanceDebugger(prev => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <PerformanceDebugger enabled={showPerformanceDebugger} />
+      
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/pod/:podId" element={<SharedPodPage />} />
+      </Routes>
     </div>
   );
 }
