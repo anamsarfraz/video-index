@@ -146,7 +146,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onSearch, onFilter, onCreat
         </div>
 
         {/* Desktop Layout */}
-        <div className="hidden md:flex gap-6 items-center">
+        <div className="hidden md:flex gap-6 items-center justify-center">
           {/* Search Bar */}
           <div className="relative flex-1 max-w-3xl group">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
