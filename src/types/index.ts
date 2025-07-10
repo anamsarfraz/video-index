@@ -1,15 +1,17 @@
 export interface Pod {
   id: string;
   title: string;
-  description: string;
-  thumbnail: string;
-  category: string;
-  urls: string[];
-  createdAt: Date;
-  interactions: number;
-  followers: number;
-  status: 'ready' | 'processing' | 'uploading' | 'error';
-  isFollowing?: boolean;
+  tags: string[];
+  image: string;
+  //description: string;
+  //thumbnail: string;
+  //category: string;
+  //urls: string[];
+  //createdAt: Date;
+  //interactions: number;
+  //followers: number;
+  //status: 'ready' | 'processing' | 'uploading' | 'error';
+  //isFollowing?: boolean;
 }
 
 export interface ChatMessage {
@@ -20,7 +22,7 @@ export interface ChatMessage {
     start: number;
     end: number;
   };
-  feedback?: 'like' | 'dislike';
+  feedback?: "like" | "dislike";
   feedbackText?: string;
   feedbackCategory?: string;
   timestamp: Date;

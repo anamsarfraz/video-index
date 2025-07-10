@@ -1,8 +1,14 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Play } from 'lucide-react';
-import { Pod } from '../types';
-import PodCard from './PodCard';
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  useRef,
+} from "react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { Play } from "lucide-react";
+import { Pod } from "../types";
+import PodCard from "./PodCard";
 
 interface PodGridProps {
   pods: Pod[];
@@ -11,14 +17,19 @@ interface PodGridProps {
   onShare?: (pod: Pod) => void;
 }
 
-const PodGrid: React.FC<PodGridProps> = ({ pods, onPodClick, onToggleFollow, onShare }) => {
+const PodGrid: React.FC<PodGridProps> = ({
+  pods,
+  onPodClick,
+  onToggleFollow,
+  onShare,
+}) => {
   const [visiblePods, setVisiblePods] = useState<Pod[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [clickedPodId, setClickedPodId] = useState<string | null>(null);
-  
+
   // Performance optimization: Detect reduced motion preference
   const prefersReducedMotion = useReducedMotion();
-  
+
   const podsPerPage = 9; // 3x3 grid max
 
   // Memoize visible pods calculation
@@ -26,7 +37,7 @@ const PodGrid: React.FC<PodGridProps> = ({ pods, onPodClick, onToggleFollow, onS
     const startIndex = 0;
     const endIndex = currentPage * podsPerPage;
     const slicedPods = pods.slice(startIndex, endIndex);
-    
+
     return {
       currentVisiblePods: slicedPods,
       hasMore: currentPage * podsPerPage < pods.length,
@@ -40,35 +51,41 @@ const PodGrid: React.FC<PodGridProps> = ({ pods, onPodClick, onToggleFollow, onS
 
   // Memoized load more handler
   const loadMore = useCallback(() => {
-    setCurrentPage(prev => prev + 1);
+    setCurrentPage((prev) => prev + 1);
   }, []);
 
   // Enhanced pod click handler with animation
-  const handlePodClick = useCallback((pod: Pod) => {
-    setClickedPodId(pod.id);
-    
-    // Add a small delay to show the opening animation before navigating
-    setTimeout(() => {
-      onPodClick(pod);
-      setClickedPodId(null);
-    }, prefersReducedMotion ? 100 : 300);
-  }, [onPodClick, prefersReducedMotion]);
+  const handlePodClick = useCallback(
+    (pod: Pod) => {
+      setClickedPodId(pod.id);
+
+      // Add a small delay to show the opening animation before navigating
+      setTimeout(
+        () => {
+          onPodClick(pod);
+          setClickedPodId(null);
+        },
+        prefersReducedMotion ? 100 : 300
+      );
+    },
+    [onPodClick, prefersReducedMotion]
+  );
 
   // Animation variants for cards
   const cardVariants = {
-    hidden: { 
-      opacity: 0, 
+    hidden: {
+      opacity: 0,
       y: prefersReducedMotion ? 0 : 20,
-      scale: prefersReducedMotion ? 1 : 0.95
+      scale: prefersReducedMotion ? 1 : 0.95,
     },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
       scale: 1,
       transition: {
         duration: prefersReducedMotion ? 0.2 : 0.5,
-        ease: [0.25, 0.46, 0.45, 0.94]
-      }
+        ease: [0.25, 0.46, 0.45, 0.94],
+      },
     },
     clicked: {
       scale: prefersReducedMotion ? 1 : 1.05,
@@ -76,9 +93,9 @@ const PodGrid: React.FC<PodGridProps> = ({ pods, onPodClick, onToggleFollow, onS
       z: prefersReducedMotion ? 0 : 50,
       transition: {
         duration: 0.3,
-        ease: "easeOut"
-      }
-    }
+        ease: "easeOut",
+      },
+    },
   };
 
   return (
@@ -89,7 +106,7 @@ const PodGrid: React.FC<PodGridProps> = ({ pods, onPodClick, onToggleFollow, onS
           {visiblePods.map((pod, index) => (
             <motion.div
               key={pod.id}
-              variants={cardVariants}
+              //variants={cardVariants}
               initial="hidden"
               animate={clickedPodId === pod.id ? "clicked" : "visible"}
               exit="hidden"
@@ -98,8 +115,8 @@ const PodGrid: React.FC<PodGridProps> = ({ pods, onPodClick, onToggleFollow, onS
                 transformStyle: "preserve-3d",
               }}
             >
-              <PodCard 
-                pod={pod} 
+              <PodCard
+                pod={pod}
                 onClick={handlePodClick}
                 onToggleFollow={onToggleFollow}
                 onShare={onShare}
@@ -125,9 +142,10 @@ const PodGrid: React.FC<PodGridProps> = ({ pods, onPodClick, onToggleFollow, onS
             whileHover={
               prefersReducedMotion
                 ? undefined
-                : { 
+                : {
                     scale: 1.05,
-                    boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+                    boxShadow:
+                      "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
                   }
             }
             whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
@@ -159,9 +177,9 @@ const PodGrid: React.FC<PodGridProps> = ({ pods, onPodClick, onToggleFollow, onS
           className="text-center py-20"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ 
-            duration: prefersReducedMotion ? 0.2 : 0.6, 
-            ease: "easeOut" 
+          transition={{
+            duration: prefersReducedMotion ? 0.2 : 0.6,
+            ease: "easeOut",
           }}
         >
           <motion.div
@@ -186,31 +204,31 @@ const PodGrid: React.FC<PodGridProps> = ({ pods, onPodClick, onToggleFollow, onS
           >
             <Play className="w-12 h-12 text-blue-600" />
           </motion.div>
-          
+
           <motion.h3
             className="text-2xl font-bold text-gray-700 mb-3"
             initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ 
-              delay: prefersReducedMotion ? 0 : 0.2, 
-              duration: prefersReducedMotion ? 0.2 : 0.5 
+            transition={{
+              delay: prefersReducedMotion ? 0 : 0.2,
+              duration: prefersReducedMotion ? 0.2 : 0.5,
             }}
           >
             No pods found
           </motion.h3>
-          
+
           <motion.p
             className="text-gray-500 text-lg"
             initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ 
-              delay: prefersReducedMotion ? 0 : 0.4, 
-              duration: prefersReducedMotion ? 0.2 : 0.5 
+            transition={{
+              delay: prefersReducedMotion ? 0 : 0.4,
+              duration: prefersReducedMotion ? 0.2 : 0.5,
             }}
           >
             Try adjusting your search or create your first pod!
           </motion.p>
-          
+
           {/* Animated dots with reduced motion support */}
           {!prefersReducedMotion && (
             <motion.div
