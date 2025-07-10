@@ -42,7 +42,7 @@ const SharedPodPage: React.FC = () => {
     );
   }
 
-  return <PodDetail pod={pod} onBack={() => navigate("/")} />;
+  return <PodDetail id={pod.id} onBack={() => navigate("/")} />;
 };
 
 // Home Page Component

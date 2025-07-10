@@ -1,22 +1,33 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, ExternalLink, Share2 } from "lucide-react";
-import { Pod } from "../types";
+import { Pod, PodResponseData } from "../types";
 import { useChat } from "../hooks/useChat";
 import { mockChatMessages } from "../utils/mockData";
 import VideoPlayer from "./VideoPlayer";
 import ChatInterface from "./ChatInterface";
 import ShareModal from "./ShareModal";
 import { getPublicVideoUrl } from "../utils/getMediaUrl";
+import { getPodById } from "../hooks/usePod";
 
 interface PodDetailProps {
-  pod: Pod;
+  id: string;
   onBack: () => void;
 }
 
-const PodDetail: React.FC<PodDetailProps> = ({ pod, onBack }) => {
+const PodDetail: React.FC<PodDetailProps> = ({ id, onBack }) => {
+  const [podData, setPodData] = useState<PodResponseData | null>(null);
   const [jumpToTime, setJumpToTime] = useState<number | undefined>();
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+
+  useEffect(() => {
+    const getData = async () => {
+      const pods = await getPodById(id);
+      setPodData(pods);
+    };
+    getData();
+  }, []);
+
   const { messages, sendMessage, addFeedback, isLoading } =
     useChat(mockChatMessages);
 
@@ -27,6 +38,16 @@ const PodDetail: React.FC<PodDetailProps> = ({ pod, onBack }) => {
   const handleShare = () => {
     setIsShareModalOpen(true);
   };
+
+  if (podData == null) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4 text-center">
+          Loading
+        </h1>
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -74,7 +95,7 @@ const PodDetail: React.FC<PodDetailProps> = ({ pod, onBack }) => {
             {/* Video Player */}
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
               <VideoPlayer
-                videoUrl={getPublicVideoUrl(pod.image)}
+                videoUrl={getPublicVideoUrl(podData.video_path)}
                 jumpToTime={jumpToTime}
               />
             </div>
@@ -82,7 +103,7 @@ const PodDetail: React.FC<PodDetailProps> = ({ pod, onBack }) => {
             {/* Pod Info */}
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h1 className="text-2xl font-bold text-gray-900 mb-3">
-                {pod.title}
+                {podData.title}
               </h1>
 
               {/* <p className="text-gray-600 mb-4">{pod.description}</p> */}
@@ -136,7 +157,7 @@ const PodDetail: React.FC<PodDetailProps> = ({ pod, onBack }) => {
       <ShareModal
         isOpen={isShareModalOpen}
         onClose={() => setIsShareModalOpen(false)}
-        pod={pod}
+        pod={podData}
       />
     </motion.div>
   );

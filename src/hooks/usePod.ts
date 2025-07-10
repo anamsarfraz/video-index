@@ -1,4 +1,4 @@
-import { Pod } from "../types";
+import { Pod, PodResponseData } from "../types";
 
 import axios from "axios";
 
@@ -9,5 +9,13 @@ export const getPods = async (): Promise<Pod[]> => {
     `https://api.videoindex.app/knowledge-bases`
   );
   console.log("Pods fetched: ", response.data);
+  return response.data;
+};
+
+export const getPodById = async (id: string): Promise<PodResponseData> => {
+  const response = await axios.get<PodResponseData>(
+    `${API_BASE_URL}/knowledge-bases/${id}`
+  );
+  console.log("Pod fetched: ", response.data);
   return response.data;
 };

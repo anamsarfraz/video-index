@@ -14,6 +14,15 @@ export interface Pod {
   //isFollowing?: boolean;
 }
 
+export interface PodResponseData {
+  id: string;
+  title: string;
+  tags: string[];
+  image: string;
+  video_path: string;
+  introduction: string;
+}
+
 export interface ChatMessage {
   id: string;
   question: string;
