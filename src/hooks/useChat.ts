@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { ChatMessage } from "../types";
-import { queryPod } from "./usePod";
+import { queryPod, submitQueryFeedback } from "./usePod";
 
 export const useChat = (id: string) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -48,86 +48,68 @@ export const useChat = (id: string) => {
     [id]
   );
 
-  // const submitFeedback = useCallback(
-  //   async (
-  //     messageId: string,
-  //     feedback: "positive" | "negative",
-  //     comment?: string
-  //   ) => {
-  //     // Find the message to get the required data
-  //     const message = messages.find((msg) => msg.id === messageId);
-  //     if (
-  //       !message ||
-  //       message.type !== "assistant" ||
-  //       !message.originalQuery ||
-  //       !message.knowledgeBaseId
-  //     ) {
-  //       console.error("Cannot submit feedback: missing required message data", {
-  //         messageFound: !!message,
-  //         isAssistant: message?.type === "assistant",
-  //         hasOriginalQuery: !!message?.originalQuery,
-  //         hasKnowledgeBaseId: !!message?.knowledgeBaseId,
-  //         message: message,
-  //       });
-  //       return;
-  //     }
+  const submitFeedback = useCallback(
+    async (
+      messageId: string,
+      feedback: "like" | "dislike",
+      feedbackText?: string,
+      category?: string
+    ) => {
+      const message = messages.find((msg) => msg.id === messageId);
 
-  //     // Optimistically update UI
-  //     setMessages((prev) =>
-  //       prev.map((msg) =>
-  //         msg.id === messageId
-  //           ? { ...msg, feedback, feedbackComment: comment }
-  //           : msg
-  //       )
-  //     );
+      // Handle cases where required data might be missing
+      if (!message) {
+        console.error("Message not found for feedback");
+        return;
+      }
 
-  //     try {
-  //       // Prepare the feedback data with proper validation
-  //       const feedbackData = {
-  //         knowledge_base_id: parseInt(message.knowledgeBaseId, 10), // Convert to integer
-  //         query: message.originalQuery,
-  //         response: message.content,
-  //         thumbs_up: feedback === "positive", // Required boolean field
-  //         // Only include comments if provided and not empty
-  //         ...(comment && comment.trim() && { comments: comment.trim() }),
-  //       };
+      // Default to pod ID if knowledgeBaseId is missing
+      const knowledgeBaseId = message.knowledgeBaseId || id;
 
-  //       // Validate the knowledge_base_id is a valid integer
-  //       if (isNaN(feedbackData.knowledge_base_id)) {
-  //         throw new Error(
-  //           `Invalid knowledge base ID: ${message.knowledgeBaseId}`
-  //         );
-  //       }
+      // Get original question if available
+      const originalQuestion = message.question || "Unknown question";
 
-  //       console.log("Submitting feedback with data:", feedbackData);
+      // Optimistically update UI
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === messageId
+            ? {
+                ...msg,
+                feedback,
+                feedbackComment: feedbackText,
+                feedbackCategory: category,
+              }
+            : msg
+        )
+      );
 
-  //       // Submit feedback to API
-  //       const result = await submitQueryFeedback(feedbackData);
+      try {
+        const feedbackData = {
+          knowledge_base_id: parseInt(knowledgeBaseId, 10),
+          query: originalQuestion,
+          response: message.answer || "",
+          thumbs_up: feedback === "like",
+          comments: feedbackText,
+          category: category,
+        };
 
-  //       if (result.success) {
-  //         console.log("Query feedback submitted successfully");
-  //         // Show success message (you could add a toast notification here)
-  //       } else {
-  //         throw new Error(result.message);
-  //       }
-  //     } catch (error) {
-  //       console.error("Failed to submit query feedback:", error);
+        await submitQueryFeedback(feedbackData);
+        console.log("Feedback submitted successfully");
+      } catch (error) {
+        console.error("Failed to submit feedback:", error);
 
-  //       // Revert UI changes on error
-  //       setMessages((prev) =>
-  //         prev.map((msg) =>
-  //           msg.id === messageId
-  //             ? { ...msg, feedback: undefined, feedbackComment: undefined }
-  //             : msg
-  //         )
-  //       );
-
-  //       // You could show an error toast here
-  //       alert("Failed to submit feedback. Please try again.");
-  //     }
-  //   },
-  //   [messages]
-  // );
+        // Revert UI changes on error
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === messageId
+              ? { ...msg, feedback: undefined, feedbackComment: undefined }
+              : msg
+          )
+        );
+      }
+    },
+    [messages, id]
+  );
 
   const clearChat = useCallback(() => {
     setMessages([]);
@@ -137,7 +119,7 @@ export const useChat = (id: string) => {
     messages,
     isLoading,
     sendMessage,
-    addFeedback: () => {}, // Placeholder for feedback function
+    submitFeedback,
     clearChat,
   };
 };

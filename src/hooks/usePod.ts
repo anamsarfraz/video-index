@@ -34,3 +34,19 @@ export const queryPod = async (
   console.log("Pod query result: ", response.data);
   return response.data;
 };
+
+export const submitQueryFeedback = async (feedbackData: {
+  knowledge_base_id: number;
+  query: string;
+  response: string;
+  thumbs_up: boolean;
+  comments?: string;
+}): Promise<{ success: boolean }> => {
+  console.log("Submitting feedback with data:", feedbackData);
+  const response = await axios.post(
+    `${API_BASE_URL}/query-feedback`,
+    feedbackData
+  );
+  console.log("Feedback submission result: ", response.data);
+  return { success: response.data.success };
+};

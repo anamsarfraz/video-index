@@ -35,16 +35,17 @@ export interface QueryResponse {
 
 export interface ChatMessage {
   id?: string;
-  knowledgeBaseId?: string;
   type: "user" | "ai";
   question?: string;
+  timestamp: string;
   answer?: string;
   videoPath?: string;
+
   feedback?: "like" | "dislike";
-  feedbackText?: string;
+  feedbackComment?: string;
   feedbackCategory?: string;
-  timestamp: string;
-  videoTimestamp?: number;
+
+  knowledgeBaseId?: string;
 }
 
 export interface FilterOption {

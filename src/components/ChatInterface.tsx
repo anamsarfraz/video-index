@@ -105,13 +105,20 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     // Voice recording logic would go here
   };
 
+  const handleThumbsUp = (messageId: string) => {
+    onFeedback(messageId, "like");
+  };
+
   const handleThumbsDown = (messageId: string) => {
     setSelectedMessageId(messageId);
     setFeedbackModalOpen(true);
   };
 
+  // Update the handleFeedbackSubmit function
   const handleFeedbackSubmit = (feedbackText: string, category: string) => {
-    onFeedback(selectedMessageId, "dislike", feedbackText, category);
+    if (selectedMessageId) {
+      onFeedback(selectedMessageId, "dislike", feedbackText, category);
+    }
     setFeedbackModalOpen(false);
     setSelectedMessageId("");
   };

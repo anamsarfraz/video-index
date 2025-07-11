@@ -27,7 +27,12 @@ const PodDetail: React.FC<PodDetailProps> = ({ id, onBack }) => {
     getData();
   }, []);
 
-  const { messages, sendMessage, addFeedback, isLoading } = useChat(id);
+  const {
+    messages,
+    sendMessage,
+    submitFeedback: addFeedback,
+    isLoading,
+  } = useChat(id);
 
   const handleJumpToTime = (time: number) => {
     setJumpToTime(time);
