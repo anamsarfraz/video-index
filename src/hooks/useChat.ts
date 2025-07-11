@@ -29,15 +29,34 @@ export const useChat = (id: string) => {
       };
 
       setMessages((prev) => [...prev, initialAiMessage]);
+     
+     let accumulatedResponse = "";
+     
       try {
         await queryPodStreaming(id, question, (chunk) => {
-          // Update the AI message with streaming content
+          // Handle both cumulative and incremental streaming
+          // If chunk.response is cumulative (contains full text so far), use it directly
+          // If chunk.response is incremental (contains only new text), append it
+          
+          let newResponse = chunk.response;
+          
+          // Check if this is incremental streaming (new chunk doesn't contain previous content)
+          if (accumulatedResponse && !chunk.response.startsWith(accumulatedResponse)) {
+            // This is incremental - append to accumulated response
+            accumulatedResponse += chunk.response;
+            newResponse = accumulatedResponse;
+          } else {
+            // This is cumulative - use chunk response directly
+            accumulatedResponse = chunk.response;
+            newResponse = chunk.response;
+          }
+          
           setMessages((prev) =>
             prev.map((msg) =>
               msg.id === aiMessageId
                 ? {
                     ...msg,
-                    answer: (msg.answer || '') + chunk.response,
+                    answer: newResponse,
                     videoPath: chunk.video_path,
                     timestamp: chunk.start_time?.toString() || new Date().toISOString(),
                   }
