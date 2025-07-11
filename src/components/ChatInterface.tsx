@@ -183,22 +183,41 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                     </div>
 
                     {/* Video Timestamp */}
-                    {message.timestamp && 
-                      message.timestamp !== new Date().toISOString() &&
-                      !isNaN(parseFloat(message.timestamp)) && 
-                      parseFloat(message.timestamp) > 0 && (
+                    {message.timestamp && (
+                      (() => {
+                        // Try to parse timestamp as number (seconds)
+                        const timeInSeconds = parseFloat(message.timestamp);
+                        if (!isNaN(timeInSeconds) && timeInSeconds > 0) {
+                          return (
+                            <button
+                              onClick={() => {
+                                console.log('Jumping to time:', timeInSeconds);
+                                onJumpToTime?.(timeInSeconds);
+                              }}
+                              className="flex items-center text-xs text-blue-600 hover:text-blue-700 transition-colors duration-200 mb-2"
+                            >
+                              <Clock className="w-3 h-3 mr-1" />
+                              {`Jump to ${formatTime(timeInSeconds)}`}
+                            </button>
+                          );
+                        }
+                        return null;
+                      })()
+                    )}
+
+                    {/* Alternative: Show start_time if available in message */}
+                    {message.videoPath && !message.timestamp && (
                         <button
-                          onClick={() =>
-                            onJumpToTime?.(parseFloat(message.timestamp))
-                          }
+                          onClick={() => {
+                            // If we have video path but no timestamp, jump to beginning
+                            console.log('Jumping to video start');
+                            onJumpToTime?.(0);
+                          }}
                           className="flex items-center text-xs text-blue-600 hover:text-blue-700 transition-colors duration-200 mb-2"
                         >
                           <Clock className="w-3 h-3 mr-1" />
-                          {`Jump to ${formatTime(
-                            parseFloat(message.timestamp)
-                          )}`}
+                          Jump to video
                         </button>
-                      )}
 
                     {/* Feedback Buttons */}
                     {!isLoading && message.answer && (

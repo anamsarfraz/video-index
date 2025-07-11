@@ -17,6 +17,7 @@ interface PodDetailProps {
 const PodDetail: React.FC<PodDetailProps> = ({ id, onBack }) => {
   const [podData, setPodData] = useState<PodResponseData | null>(null);
   const [jumpToTime, setJumpToTime] = useState<number | undefined>();
+  const [isVideoReady, setIsVideoReady] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   useEffect(() => {
@@ -40,7 +41,15 @@ const PodDetail: React.FC<PodDetailProps> = ({ id, onBack }) => {
   } = useChat(id);
 
   const handleJumpToTime = (time: number) => {
+    console.log('Jump to time requested:', time);
     setJumpToTime(time);
+    // Reset jumpToTime after a short delay to allow for multiple jumps to the same time
+    setTimeout(() => setJumpToTime(undefined), 100);
+  };
+
+  const handleVideoReady = () => {
+    console.log('Video is ready for playback');
+    setIsVideoReady(true);
   };
 
   const handleShare = () => {
@@ -105,6 +114,7 @@ const PodDetail: React.FC<PodDetailProps> = ({ id, onBack }) => {
               <VideoPlayer
                 videoUrl={getPublicVideoUrl(podData.video_path)}
                 jumpToTime={jumpToTime}
+                onVideoReady={handleVideoReady}
               />
             </div>
 
