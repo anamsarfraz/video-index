@@ -37,9 +37,9 @@ export const useChat = (id: string) => {
               msg.id === aiMessageId
                 ? {
                     ...msg,
-                    answer: chunk.response,
+                    answer: (msg.answer || '') + chunk.response,
                     videoPath: chunk.video_path,
-                    timestamp: chunk.start_time.toString(),
+                    timestamp: chunk.start_time?.toString() || new Date().toISOString(),
                   }
                 : msg
             )

@@ -57,41 +57,91 @@ export const queryPodStreaming = async (
       const { done, value } = await reader.read();
       
       if (done) {
+        // Process any remaining complete JSON in buffer before breaking
+        if (buffer.trim()) {
+          const lines = buffer.trim().split('\n');
+          for (const line of lines) {
+            const trimmedLine = line.trim();
+            if (trimmedLine && trimmedLine.startsWith('{') && trimmedLine.endsWith('}')) {
+              try {
+                const chunk = JSON.parse(trimmedLine) as QueryResponse;
+                console.log("Received final streaming chunk:", chunk);
+                onChunk(chunk);
+              } catch (parseError) {
+                console.warn("Failed to parse final chunk:", trimmedLine, parseError);
+              }
+            }
+          }
+        }
         break;
       }
 
       // Decode the chunk and add to buffer
       buffer += decoder.decode(value, { stream: true });
       
-      // Process complete JSON objects from buffer
-      const lines = buffer.split('\n');
-      buffer = lines.pop() || ''; // Keep incomplete line in buffer
+      // Look for complete JSON objects in the buffer
+      let processedUpTo = 0;
+      let braceCount = 0;
+      let inString = false;
+      let escapeNext = false;
+      let jsonStart = -1;
       
-      for (const line of lines) {
-        const trimmedLine = line.trim();
-        if (trimmedLine) {
-          try {
-            const chunk = JSON.parse(trimmedLine) as QueryResponse;
-            console.log("Received streaming chunk:", chunk);
-            // Only call onChunk if there's actual response content or it's the first chunk
-            if (chunk.response !== undefined) {
-              onChunk(chunk);
+      for (let i = 0; i < buffer.length; i++) {
+        const char = buffer[i];
+        
+        if (escapeNext) {
+          escapeNext = false;
+          continue;
+        }
+        
+        if (char === '\\' && inString) {
+          escapeNext = true;
+          continue;
+        }
+        
+        if (char === '"' && !escapeNext) {
+          inString = !inString;
+          continue;
+        }
+        
+        if (!inString) {
+          if (char === '{') {
+            if (braceCount === 0) {
+              jsonStart = i;
             }
-          } catch (parseError) {
-            console.warn("Failed to parse streaming chunk:", trimmedLine, parseError);
+            braceCount++;
+          } else if (char === '}') {
+            braceCount--;
+            
+            // Found complete JSON object
+            if (braceCount === 0 && jsonStart !== -1) {
+              const jsonStr = buffer.substring(jsonStart, i + 1);
+              
+              try {
+                const chunk = JSON.parse(jsonStr) as QueryResponse;
+                console.log("Received streaming chunk:", chunk);
+                
+                // Only call onChunk if there's actual response content
+                if (chunk.response !== undefined) {
+                  onChunk(chunk);
+                }
+                
+                processedUpTo = i + 1;
+                jsonStart = -1;
+              } catch (parseError) {
+                console.warn("Failed to parse JSON chunk:", jsonStr, parseError);
+                // Reset and continue looking for next valid JSON
+                braceCount = 0;
+                jsonStart = -1;
+              }
+            }
           }
         }
       }
-    }
-    
-    // Process any remaining data in buffer
-    if (buffer.trim()) {
-      try {
-        const chunk = JSON.parse(buffer.trim()) as QueryResponse;
-        console.log("Received final streaming chunk:", chunk);
-        onChunk(chunk);
-      } catch (parseError) {
-        console.warn("Failed to parse final chunk:", buffer, parseError);
+      
+      // Remove processed data from buffer, keep unprocessed data
+      if (processedUpTo > 0) {
+        buffer = buffer.substring(processedUpTo).trim();
       }
     }
   } finally {
