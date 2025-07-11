@@ -11,7 +11,7 @@ import CreatePodModal from "./components/CreatePodModal";
 import PodDetail from "./components/PodDetail";
 import PerformanceDebugger from "./components/PerformanceDebugger";
 import ShareModal from "./components/ShareModal";
-import { getPods } from "./hooks/usePod";
+import { getPods, getPodById } from "./hooks/usePod";
 
 // Shared Pod Page Component
 const SharedPodPage: React.FC = () => {
