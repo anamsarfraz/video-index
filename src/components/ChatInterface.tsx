@@ -168,9 +168,19 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 // AI message
                 <div className="flex justify-start">
                   <div className="max-w-sm bg-white rounded-lg px-4 py-3 shadow-sm border border-gray-200">
-                    <p className="text-sm text-gray-800 mb-2">
+                    <div className="text-sm text-gray-800 mb-2">
                       {message.answer}
-                    </p>
+                      {/* Show typing indicator if message is being streamed */}
+                      {isLoading && index === messages.length - 1 && (
+                        <motion.span
+                          className="inline-block ml-1"
+                          animate={{ opacity: [0.5, 1, 0.5] }}
+                          transition={{ duration: 1, repeat: Infinity }}
+                        >
+                          ▋
+                        </motion.span>
+                      )}
+                    </div>
 
                     {/* Video Timestamp */}
                     {message.timestamp &&

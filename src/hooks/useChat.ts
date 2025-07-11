@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { ChatMessage } from "../types";
-import { queryPod, submitQueryFeedback } from "./usePod";
+import { queryPodStreaming, submitQueryFeedback } from "./usePod";
 
 export const useChat = (id: string) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -19,28 +19,46 @@ export const useChat = (id: string) => {
       setMessages((prev) => [...prev, userMessage]);
       setIsLoading(true);
 
-      try {
-        const response = await queryPod(id, question);
-        const aiResponse: ChatMessage = {
-          id: `assistant-${Date.now()}`,
-          type: "ai",
-          answer: response.response,
-          videoPath: response.video_path,
-          timestamp: response.start_time,
-        };
+      // Create a placeholder AI message that will be updated with streaming content
+      const aiMessageId = `assistant-${Date.now()}`;
+      const initialAiMessage: ChatMessage = {
+        id: aiMessageId,
+        type: "ai",
+        answer: "",
+        timestamp: new Date().toISOString(),
+      };
 
-        setMessages((prev) => [...prev, aiResponse]);
+      setMessages((prev) => [...prev, initialAiMessage]);
+      try {
+        await queryPodStreaming(id, question, (chunk) => {
+          // Update the AI message with streaming content
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === aiMessageId
+                ? {
+                    ...msg,
+                    answer: chunk.response,
+                    videoPath: chunk.video_path,
+                    timestamp: chunk.start_time.toString(),
+                  }
+                : msg
+            )
+          );
+        });
       } catch (error) {
         console.error("Error querying knowledge base:", error);
-        const errorMessage: ChatMessage = {
-          id: `error-${Date.now()}`,
-          type: "ai",
-          answer:
-            "I'm sorry, I encountered an error while processing your question. Please try again.",
-          timestamp: new Date().toISOString(),
-        };
-
-        setMessages((prev) => [...prev, errorMessage]);
+        
+        // Update the placeholder message with error content
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === aiMessageId
+              ? {
+                  ...msg,
+                  answer: "I'm sorry, I encountered an error while processing your question. Please try again.",
+                }
+              : msg
+          )
+        );
       } finally {
         setIsLoading(false);
       }

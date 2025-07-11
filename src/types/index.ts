@@ -28,7 +28,7 @@ export interface QueryResponse {
   query: string;
   response: string;
   video_path: string;
-  image_path: string[];
+  images_paths: string[];
   start_time: string;
   end_time: string;
 }
