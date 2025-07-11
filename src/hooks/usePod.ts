@@ -13,11 +13,22 @@ export const getPods = async (): Promise<Pod[]> => {
 };
 
 export const getPodById = async (id: string): Promise<PodResponseData> => {
-  const response = await axios.get<PodResponseData>(
-    `${API_BASE_URL}/knowledge-bases/${id}`
-  );
-  console.log("Pod fetched: ", response.data);
-  return response.data;
+  try {
+    const response = await axios.get<PodResponseData>(
+      `${API_BASE_URL}/knowledge-bases/${id}`
+    );
+    console.log("Pod fetched: ", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching pod by ID:", error);
+    if (axios.isAxiosError(error)) {
+      if (error.response?.status === 404) {
+        throw new Error("Pod not found");
+      }
+      throw new Error(`Failed to fetch pod: ${error.response?.statusText || error.message}`);
+    }
+    throw new Error("Failed to fetch pod");
+  }
 };
 
 export const queryPodStreaming = async (
