@@ -35,6 +35,9 @@ export const useChat = (id: string) => {
         let hasReceivedFirstChunk = false;
         
         await queryPodStreaming(id, question, (chunk) => {
+          console.log('Received chunk:', chunk);
+          console.log('start_time from chunk:', chunk.start_time);
+          
           // Handle immediate video update from first chunk
           if (!hasReceivedFirstChunk && chunk.video_path && chunk.start_time !== undefined) {
             console.log('First chunk received, updating video immediately:', chunk.video_path, chunk.start_time);
@@ -51,9 +54,9 @@ export const useChat = (id: string) => {
                 ? {
                     ...msg,
                     answer: (msg.answer || '') + chunk.response,
-                    // Set video path and timestamp only from the first chunk
-                    videoPath: msg.videoPath || (hasReceivedFirstChunk ? chunk.video_path : undefined),
-                    timestamp: msg.timestamp !== new Date().toISOString() ? msg.timestamp : (hasReceivedFirstChunk ? chunk.start_time?.toString() : undefined),
+                    // Set video path and timestamp only from the first chunk that has them
+                    videoPath: msg.videoPath || chunk.video_path,
+                    timestamp: (msg.timestamp === initialAiMessage.timestamp && chunk.start_time !== undefined) ? chunk.start_time.toString() : msg.timestamp,
                   }
                 : msg
             )
