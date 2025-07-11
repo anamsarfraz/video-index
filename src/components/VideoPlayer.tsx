@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Play, Pause, Volume2, Maximize, SkipBack, SkipForward } from 'lucide-react';
 
@@ -6,14 +6,36 @@ interface VideoPlayerProps {
   videoUrl: string;
   onTimeUpdate?: (currentTime: number) => void;
   jumpToTime?: number;
+  onVideoReady?: () => void;
 }
 
-const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, onTimeUpdate, jumpToTime }) => {
+const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, onTimeUpdate, jumpToTime, onVideoReady }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
+  const [isVideoReady, setIsVideoReady] = useState(false);
+  const [videoError, setVideoError] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const currentVideoUrlRef = useRef<string>('');
+
+  // Reset video ready state when video URL changes
+  useEffect(() => {
+    if (videoUrl !== currentVideoUrlRef.current) {
+      console.log('Video URL changed from', currentVideoUrlRef.current, 'to', videoUrl);
+      setIsVideoReady(false);
+      setIsPlaying(false);
+      setVideoError(false);
+      setCurrentTime(0);
+      setDuration(0);
+      currentVideoUrlRef.current = videoUrl;
+      
+      // Force video element to load new source
+      if (videoRef.current) {
+        videoRef.current.load();
+      }
+    }
+  }, [videoUrl]);
 
   const togglePlay = () => {
     if (videoRef.current) {
@@ -37,7 +59,24 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, onTimeUpdate, jumpT
   const handleLoadedMetadata = () => {
     if (videoRef.current) {
       setDuration(videoRef.current.duration);
+      setIsVideoReady(true);
+      setVideoError(false);
+      console.log('Video metadata loaded, duration:', videoRef.current.duration);
+      onVideoReady?.();
     }
+  };
+
+  const handleVideoError = () => {
+    console.error('Video failed to load:', videoUrl);
+    setVideoError(true);
+    setIsVideoReady(false);
+  };
+
+  const handleCanPlay = () => {
+    console.log('Video can play');
+    setIsVideoReady(true);
+    setVideoError(false);
+    onVideoReady?.();
   };
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,25 +109,62 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, onTimeUpdate, jumpT
 
   // Jump to specific time when requested
   React.useEffect(() => {
-    if (jumpToTime !== undefined && videoRef.current) {
+    if (jumpToTime !== undefined && videoRef.current && isVideoReady) {
+      console.log('Jumping to time:', jumpToTime, 'Video ready:', isVideoReady);
       videoRef.current.currentTime = jumpToTime;
+      setCurrentTime(jumpToTime);
     }
-  }, [jumpToTime]);
+  }, [jumpToTime, isVideoReady]);
 
   return (
     <div className="relative bg-black rounded-lg overflow-hidden group">
       {/* Video Element */}
       <video
         ref={videoRef}
+        src={videoUrl}
         className="w-full aspect-video"
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
+        onLoadedData={handleCanPlay}
+        onCanPlay={handleCanPlay}
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
+        onError={handleVideoError}
+        preload="metadata"
+        key={videoUrl}
       >
-        <source src={videoUrl} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
+
+      {/* Loading indicator */}
+      {!isVideoReady && !videoError && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+          <div className="text-white text-center">
+            <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-2"></div>
+            <p className="text-sm">Loading video...</p>
+          </div>
+        </div>
+      )}
+
+      {/* Error indicator */}
+      {videoError && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+          <div className="text-white text-center">
+            <p className="text-sm mb-2">Failed to load video</p>
+            <button 
+              onClick={() => {
+                setVideoError(false);
+                if (videoRef.current) {
+                  videoRef.current.load();
+                }
+              }}
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Custom Controls */}
       <motion.div

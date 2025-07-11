@@ -23,7 +23,7 @@ interface ChatInterfaceProps {
     category?: string
   ) => void;
   isLoading?: boolean;
-  onJumpToTime?: (time: number) => void;
+  onJumpToTime?: (time: number, videoPath?: string) => void;
 }
 
 const statusMessages = [
@@ -171,7 +171,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                     <div className="text-sm text-gray-800 mb-2">
                       <span>{message.answer}</span>
                       {/* Show typing indicator if message is being streamed */}
-                      {isLoading && index === messages.length - 1 && message.type === 'ai' && !message.answer && (
+                      {isLoading && index === messages.length - 1 && message.type === 'ai' && (
                         <motion.span
                           className="inline-block ml-1"
                           animate={{ opacity: [0.5, 1, 0.5] }}
@@ -183,22 +183,42 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                     </div>
 
                     {/* Video Timestamp */}
-                    {message.timestamp && 
-                      message.timestamp !== new Date().toISOString() &&
-                      !isNaN(parseFloat(message.timestamp)) && 
-                      parseFloat(message.timestamp) > 0 && (
+                    {message.timestamp && !isLoading && (
+                      (() => {
+                        // Try to parse timestamp as number (seconds)
+                        const timeInSeconds = parseFloat(message.timestamp);
+                        if (!isNaN(timeInSeconds) && timeInSeconds > 0) {
+                          return (
+                            <button
+                              onClick={() => {
+                                console.log('Jumping to time:', timeInSeconds);
+                                onJumpToTime?.(timeInSeconds, message.videoPath);
+                              }}
+                              className="flex items-center text-xs text-blue-600 hover:text-blue-700 transition-colors duration-200 mb-2"
+                            >
+                              <Clock className="w-3 h-3 mr-1" />
+                              {`Jump to ${formatTime(timeInSeconds)}`}
+                            </button>
+                          );
+                        }
+                        return null;
+                      })()
+                    )}
+
+                    {/* Alternative: Show start_time if available in message */}
+                    {message.videoPath && !message.timestamp && !isLoading && (
                         <button
-                          onClick={() =>
-                            onJumpToTime?.(parseFloat(message.timestamp))
-                          }
+                          onClick={() => {
+                            // If we have video path but no timestamp, jump to beginning
+                            console.log('Jumping to video start');
+                            onJumpToTime?.(0, message.videoPath);
+                          }}
                           className="flex items-center text-xs text-blue-600 hover:text-blue-700 transition-colors duration-200 mb-2"
                         >
                           <Clock className="w-3 h-3 mr-1" />
-                          {`Jump to ${formatTime(
-                            parseFloat(message.timestamp)
-                          )}`}
+                          Jump to video
                         </button>
-                      )}
+                    )}
 
                     {/* Feedback Buttons */}
                     {!isLoading && message.answer && (

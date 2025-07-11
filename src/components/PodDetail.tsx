@@ -16,7 +16,10 @@ interface PodDetailProps {
 
 const PodDetail: React.FC<PodDetailProps> = ({ id, onBack }) => {
   const [podData, setPodData] = useState<PodResponseData | null>(null);
+  const [currentVideoUrl, setCurrentVideoUrl] = useState<string>("");
   const [jumpToTime, setJumpToTime] = useState<number | undefined>();
+  const [isVideoReady, setIsVideoReady] = useState(false);
+  const [pendingSeek, setPendingSeek] = useState<{ time: number; videoPath?: string } | null>(null);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   useEffect(() => {
@@ -24,6 +27,8 @@ const PodDetail: React.FC<PodDetailProps> = ({ id, onBack }) => {
       try {
         const podData = await getPodById(id);
         setPodData(podData);
+        // Set initial video URL
+        setCurrentVideoUrl(getPublicVideoUrl(podData.video_path));
       } catch (error) {
         console.error("Error fetching pod data:", error);
         // Handle error - could set an error state here
@@ -37,10 +42,71 @@ const PodDetail: React.FC<PodDetailProps> = ({ id, onBack }) => {
     sendMessage,
     submitFeedback: addFeedback,
     isLoading,
+    onVideoUpdate,
   } = useChat(id);
 
-  const handleJumpToTime = (time: number) => {
-    setJumpToTime(time);
+  // Handle immediate video updates from streaming
+  useEffect(() => {
+    if (onVideoUpdate) {
+      onVideoUpdate((videoPath: string, timestamp: string) => {
+        console.log('Immediate video update:', videoPath, timestamp);
+        const newVideoUrl = getPublicVideoUrl(videoPath);
+        if (newVideoUrl !== currentVideoUrl) {
+          setCurrentVideoUrl(newVideoUrl);
+          setIsVideoReady(false);
+        }
+        
+        // Store the timestamp for later seeking
+        const timeInSeconds = parseFloat(timestamp);
+        if (!isNaN(timeInSeconds) && timeInSeconds > 0) {
+          setPendingSeek({ time: timeInSeconds, videoPath });
+        }
+      });
+    }
+  }, [onVideoUpdate, currentVideoUrl]);
+
+
+  const handleJumpToTime = (time: number, videoPath?: string) => {
+    console.log('Jump to time requested:', time);
+    
+    // If a specific video path is provided, switch to that video first
+    if (videoPath) {
+      const newVideoUrl = getPublicVideoUrl(videoPath);
+      console.log('Switching to video:', newVideoUrl);
+      
+      // Store the pending seek operation
+      setPendingSeek({ time, videoPath });
+      
+      // Only change video if it's different
+      if (newVideoUrl !== currentVideoUrl) {
+        setCurrentVideoUrl(newVideoUrl);
+        setIsVideoReady(false);
+      } else {
+        // Same video, just seek
+        setJumpToTime(time);
+        setTimeout(() => setJumpToTime(undefined), 100);
+        setPendingSeek(null);
+      }
+    } else {
+      // Jump in current video
+      setJumpToTime(time);
+      setTimeout(() => setJumpToTime(undefined), 100);
+    }
+  };
+
+  const handleVideoReady = () => {
+    console.log('Video is ready for playback');
+    setIsVideoReady(true);
+    
+    // Execute pending seek if there is one
+    if (pendingSeek) {
+      console.log('Executing pending seek to:', pendingSeek.time);
+      setTimeout(() => {
+        setJumpToTime(pendingSeek.time);
+        setTimeout(() => setJumpToTime(undefined), 100);
+        setPendingSeek(null);
+      }, 200);
+    }
   };
 
   const handleShare = () => {
@@ -103,8 +169,9 @@ const PodDetail: React.FC<PodDetailProps> = ({ id, onBack }) => {
             {/* Video Player */}
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
               <VideoPlayer
-                videoUrl={getPublicVideoUrl(podData.video_path)}
+                videoUrl={currentVideoUrl}
                 jumpToTime={jumpToTime}
+                onVideoReady={handleVideoReady}
               />
             </div>
 

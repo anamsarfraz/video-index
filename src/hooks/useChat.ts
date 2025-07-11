@@ -1,10 +1,11 @@
 import { useState, useCallback } from "react";
 import { ChatMessage } from "../types";
-import { queryPodStreaming, submitQueryFeedback } from "./usePod";
+import { queryPodStreaming, submitQueryFeedback } from "../hooks/usePod";
 
 export const useChat = (id: string) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [videoUpdateCallback, setVideoUpdateCallback] = useState<((videoPath: string, timestamp: string) => void) | null>(null);
 
   const sendMessage = useCallback(
     async (question: string) => {
@@ -29,36 +30,33 @@ export const useChat = (id: string) => {
       };
 
       setMessages((prev) => [...prev, initialAiMessage]);
-     
-     let accumulatedResponse = "";
-     
+
       try {
+        let hasReceivedFirstChunk = false;
+        
         await queryPodStreaming(id, question, (chunk) => {
-          // Handle both cumulative and incremental streaming
-          // If chunk.response is cumulative (contains full text so far), use it directly
-          // If chunk.response is incremental (contains only new text), append it
+          console.log('Received chunk:', chunk);
+          console.log('start_time from chunk:', chunk.start_time);
           
-          let newResponse = chunk.response;
-          
-          // Check if this is incremental streaming (new chunk doesn't contain previous content)
-          if (accumulatedResponse && !chunk.response.startsWith(accumulatedResponse)) {
-            // This is incremental - append to accumulated response
-            accumulatedResponse += chunk.response;
-            newResponse = accumulatedResponse;
-          } else {
-            // This is cumulative - use chunk response directly
-            accumulatedResponse = chunk.response;
-            newResponse = chunk.response;
+          // Handle immediate video update from first chunk
+          if (!hasReceivedFirstChunk && chunk.video_path && chunk.start_time !== undefined) {
+            console.log('First chunk received, updating video immediately:', chunk.video_path, chunk.start_time);
+            if (videoUpdateCallback) {
+              videoUpdateCallback(chunk.video_path, chunk.start_time.toString());
+            }
+            hasReceivedFirstChunk = true;
           }
           
+          // Update the message with the new chunk response
           setMessages((prev) =>
             prev.map((msg) =>
               msg.id === aiMessageId
                 ? {
                     ...msg,
-                    answer: newResponse,
-                    videoPath: chunk.video_path,
-                    timestamp: chunk.start_time?.toString() || new Date().toISOString(),
+                    answer: (msg.answer || '') + chunk.response,
+                    // Set video path and timestamp only from the first chunk that has them
+                    videoPath: msg.videoPath || chunk.video_path,
+                    timestamp: (msg.timestamp === initialAiMessage.timestamp && chunk.start_time !== undefined) ? chunk.start_time.toString() : msg.timestamp,
                   }
                 : msg
             )
@@ -82,8 +80,12 @@ export const useChat = (id: string) => {
         setIsLoading(false);
       }
     },
-    [id]
+    [id, videoUpdateCallback]
   );
+
+  const onVideoUpdate = useCallback((callback: (videoPath: string, timestamp: string) => void) => {
+    setVideoUpdateCallback(() => callback);
+  }, []);
 
   const submitFeedback = useCallback(
     async (
@@ -112,9 +114,8 @@ export const useChat = (id: string) => {
           msg.id === messageId
             ? {
                 ...msg,
-                answer: (msg.answer || '') + chunk.response,
+                feedback,
                 feedbackComment: feedbackText,
-                timestamp: chunk.start_time?.toString() || new Date().toISOString(),
               }
             : msg
         )
@@ -158,5 +159,6 @@ export const useChat = (id: string) => {
     sendMessage,
     submitFeedback,
     clearChat,
+    onVideoUpdate,
   };
 };
