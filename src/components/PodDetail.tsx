@@ -19,6 +19,7 @@ const PodDetail: React.FC<PodDetailProps> = ({ id, onBack }) => {
   const [currentVideoUrl, setCurrentVideoUrl] = useState<string>("");
   const [jumpToTime, setJumpToTime] = useState<number | undefined>();
   const [isVideoReady, setIsVideoReady] = useState(false);
+  const [pendingSeek, setPendingSeek] = useState<{ time: number; videoPath?: string } | null>(null);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   useEffect(() => {
@@ -43,6 +44,20 @@ const PodDetail: React.FC<PodDetailProps> = ({ id, onBack }) => {
     isLoading,
   } = useChat(id);
 
+  // Auto-seek when new messages arrive with video content
+  useEffect(() => {
+    if (messages.length > 0) {
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage.type === 'ai' && lastMessage.videoPath && lastMessage.timestamp) {
+        const timeInSeconds = parseFloat(lastMessage.timestamp);
+        if (!isNaN(timeInSeconds) && timeInSeconds > 0) {
+          console.log('Auto-seeking to:', timeInSeconds, 'in video:', lastMessage.videoPath);
+          handleJumpToTime(timeInSeconds, lastMessage.videoPath);
+        }
+      }
+    }
+  }, [messages]);
+
   const handleJumpToTime = (time: number, videoPath?: string) => {
     console.log('Jump to time requested:', time);
     
@@ -50,14 +65,20 @@ const PodDetail: React.FC<PodDetailProps> = ({ id, onBack }) => {
     if (videoPath) {
       const newVideoUrl = getPublicVideoUrl(videoPath);
       console.log('Switching to video:', newVideoUrl);
-      setCurrentVideoUrl(newVideoUrl);
-      setIsVideoReady(false); // Reset video ready state for new video
       
-      // Wait a bit for video to load before jumping
-      setTimeout(() => {
+      // Store the pending seek operation
+      setPendingSeek({ time, videoPath });
+      
+      // Only change video if it's different
+      if (newVideoUrl !== currentVideoUrl) {
+        setCurrentVideoUrl(newVideoUrl);
+        setIsVideoReady(false);
+      } else {
+        // Same video, just seek
         setJumpToTime(time);
         setTimeout(() => setJumpToTime(undefined), 100);
-      }, 500);
+        setPendingSeek(null);
+      }
     } else {
       // Jump in current video
       setJumpToTime(time);
@@ -68,6 +89,16 @@ const PodDetail: React.FC<PodDetailProps> = ({ id, onBack }) => {
   const handleVideoReady = () => {
     console.log('Video is ready for playback');
     setIsVideoReady(true);
+    
+    // Execute pending seek if there is one
+    if (pendingSeek) {
+      console.log('Executing pending seek to:', pendingSeek.time);
+      setTimeout(() => {
+        setJumpToTime(pendingSeek.time);
+        setTimeout(() => setJumpToTime(undefined), 100);
+        setPendingSeek(null);
+      }, 200);
+    }
   };
 
   const handleShare = () => {

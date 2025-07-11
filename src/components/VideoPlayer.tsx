@@ -15,6 +15,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, onTimeUpdate, jumpT
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
   const [isVideoReady, setIsVideoReady] = useState(false);
+  const [videoError, setVideoError] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const currentVideoUrlRef = useRef<string>('');
 
@@ -24,7 +25,15 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, onTimeUpdate, jumpT
       console.log('Video URL changed from', currentVideoUrlRef.current, 'to', videoUrl);
       setIsVideoReady(false);
       setIsPlaying(false);
+      setVideoError(false);
+      setCurrentTime(0);
+      setDuration(0);
       currentVideoUrlRef.current = videoUrl;
+      
+      // Force video element to load new source
+      if (videoRef.current) {
+        videoRef.current.load();
+      }
     }
   }, [videoUrl]);
 
@@ -51,9 +60,23 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, onTimeUpdate, jumpT
     if (videoRef.current) {
       setDuration(videoRef.current.duration);
       setIsVideoReady(true);
+      setVideoError(false);
       console.log('Video metadata loaded, duration:', videoRef.current.duration);
       onVideoReady?.();
     }
+  };
+
+  const handleVideoError = () => {
+    console.error('Video failed to load:', videoUrl);
+    setVideoError(true);
+    setIsVideoReady(false);
+  };
+
+  const handleCanPlay = () => {
+    console.log('Video can play');
+    setIsVideoReady(true);
+    setVideoError(false);
+    onVideoReady?.();
   };
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,6 +113,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, onTimeUpdate, jumpT
       console.log('Jumping to time:', jumpToTime, 'Video ready:', isVideoReady);
       videoRef.current.currentTime = jumpToTime;
       setCurrentTime(jumpToTime);
+      
+      // Auto-play after seeking
+      if (!isPlaying) {
+        videoRef.current.play().catch(console.error);
+      }
     }
   }, [jumpToTime, isVideoReady]);
 
@@ -102,21 +130,43 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, onTimeUpdate, jumpT
         className="w-full aspect-video"
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
-        onLoadedData={() => setIsVideoReady(true)}
-        onCanPlay={() => setIsVideoReady(true)}
+        onLoadedData={handleCanPlay}
+        onCanPlay={handleCanPlay}
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
+        onError={handleVideoError}
         preload="metadata"
+        key={videoUrl}
       >
         Your browser does not support the video tag.
       </video>
 
       {/* Loading indicator */}
-      {!isVideoReady && (
+      {!isVideoReady && !videoError && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/50">
           <div className="text-white text-center">
             <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-2"></div>
             <p className="text-sm">Loading video...</p>
+          </div>
+        </div>
+      )}
+
+      {/* Error indicator */}
+      {videoError && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+          <div className="text-white text-center">
+            <p className="text-sm mb-2">Failed to load video</p>
+            <button 
+              onClick={() => {
+                setVideoError(false);
+                if (videoRef.current) {
+                  videoRef.current.load();
+                }
+              }}
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Retry
+            </button>
           </div>
         </div>
       )}
