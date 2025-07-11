@@ -171,7 +171,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                     <div className="text-sm text-gray-800 mb-2">
                       <span>{message.answer}</span>
                       {/* Show typing indicator if message is being streamed */}
-                      {isLoading && index === messages.length - 1 && message.type === 'ai' && !message.answer && (
+                      {isLoading && index === messages.length - 1 && message.type === 'ai' && (
                         <motion.span
                           className="inline-block ml-1"
                           animate={{ opacity: [0.5, 1, 0.5] }}
