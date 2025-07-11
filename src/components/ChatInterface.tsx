@@ -171,7 +171,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                     <div className="text-sm text-gray-800 mb-2">
                       <span>{message.answer}</span>
                       {/* Show typing indicator if message is being streamed */}
-                      {isLoading && index === messages.length - 1 && message.type === 'ai' && (
+                      {isLoading && index === messages.length - 1 && message.type === 'ai' && !message.answer && (
                         <motion.span
                           className="inline-block ml-1"
                           animate={{ opacity: [0.5, 1, 0.5] }}
@@ -183,8 +183,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                     </div>
 
                     {/* Video Timestamp */}
-                    {message.timestamp &&
-                      !isNaN(parseFloat(message.timestamp)) && (
+                    {message.timestamp && 
+                      message.timestamp !== new Date().toISOString() &&
+                      !isNaN(parseFloat(message.timestamp)) && 
+                      parseFloat(message.timestamp) > 0 && (
                         <button
                           onClick={() =>
                             onJumpToTime?.(parseFloat(message.timestamp))
@@ -199,7 +201,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                       )}
 
                     {/* Feedback Buttons */}
-                    <div className="flex items-center justify-between">
+                    {!isLoading && message.answer && (
+                      <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <button
                           onClick={() => onFeedback(message.id!, "like")}
@@ -223,12 +226,13 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                         </button>
                       </div>
                       <span className="text-xs text-gray-500">
-                        {new Date(message.timestamp).toLocaleTimeString([], {
+                        {new Date().toLocaleTimeString([], {
                           hour: "2-digit",
                           minute: "2-digit",
                         })}
                       </span>
-                    </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
