@@ -40,7 +40,7 @@ export const useChat = (id: string) => {
                     ...msg,
                     answer: (msg.answer || '') + chunk.response,
                     videoPath: chunk.video_path,
-                    timestamp: chunk.start_time?.toString(),
+                    timestamp: chunk.start_time?.toString() || msg.timestamp,
                   }
                 : msg
             )

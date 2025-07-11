@@ -16,6 +16,17 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, onTimeUpdate, jumpT
   const [volume, setVolume] = useState(1);
   const [isVideoReady, setIsVideoReady] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const currentVideoUrlRef = useRef<string>('');
+
+  // Reset video ready state when video URL changes
+  useEffect(() => {
+    if (videoUrl !== currentVideoUrlRef.current) {
+      console.log('Video URL changed from', currentVideoUrlRef.current, 'to', videoUrl);
+      setIsVideoReady(false);
+      setIsPlaying(false);
+      currentVideoUrlRef.current = videoUrl;
+    }
+  }, [videoUrl]);
 
   const togglePlay = () => {
     if (videoRef.current) {
@@ -40,6 +51,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, onTimeUpdate, jumpT
     if (videoRef.current) {
       setDuration(videoRef.current.duration);
       setIsVideoReady(true);
+      console.log('Video metadata loaded, duration:', videoRef.current.duration);
       onVideoReady?.();
     }
   };
@@ -75,6 +87,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, onTimeUpdate, jumpT
   // Jump to specific time when requested
   React.useEffect(() => {
     if (jumpToTime !== undefined && videoRef.current && isVideoReady) {
+      console.log('Jumping to time:', jumpToTime, 'Video ready:', isVideoReady);
       videoRef.current.currentTime = jumpToTime;
       setCurrentTime(jumpToTime);
     }
@@ -85,6 +98,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, onTimeUpdate, jumpT
       {/* Video Element */}
       <video
         ref={videoRef}
+        src={videoUrl}
         className="w-full aspect-video"
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
@@ -94,7 +108,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, onTimeUpdate, jumpT
         onPause={() => setIsPlaying(false)}
         preload="metadata"
       >
-        <source src={videoUrl} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
 

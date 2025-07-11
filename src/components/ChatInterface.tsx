@@ -23,7 +23,7 @@ interface ChatInterfaceProps {
     category?: string
   ) => void;
   isLoading?: boolean;
-  onJumpToTime?: (time: number) => void;
+  onJumpToTime?: (time: number, videoPath?: string) => void;
 }
 
 const statusMessages = [
@@ -192,7 +192,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                             <button
                               onClick={() => {
                                 console.log('Jumping to time:', timeInSeconds);
-                                onJumpToTime?.(timeInSeconds);
+                                onJumpToTime?.(timeInSeconds, message.videoPath);
                               }}
                               className="flex items-center text-xs text-blue-600 hover:text-blue-700 transition-colors duration-200 mb-2"
                             >
@@ -211,7 +211,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                           onClick={() => {
                             // If we have video path but no timestamp, jump to beginning
                             console.log('Jumping to video start');
-                            onJumpToTime?.(0);
+                            onJumpToTime?.(0, message.videoPath);
                           }}
                           className="flex items-center text-xs text-blue-600 hover:text-blue-700 transition-colors duration-200 mb-2"
                         >

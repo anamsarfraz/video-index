@@ -16,6 +16,7 @@ interface PodDetailProps {
 
 const PodDetail: React.FC<PodDetailProps> = ({ id, onBack }) => {
   const [podData, setPodData] = useState<PodResponseData | null>(null);
+  const [currentVideoUrl, setCurrentVideoUrl] = useState<string>("");
   const [jumpToTime, setJumpToTime] = useState<number | undefined>();
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
@@ -25,6 +26,8 @@ const PodDetail: React.FC<PodDetailProps> = ({ id, onBack }) => {
       try {
         const podData = await getPodById(id);
         setPodData(podData);
+        // Set initial video URL
+        setCurrentVideoUrl(getPublicVideoUrl(podData.video_path));
       } catch (error) {
         console.error("Error fetching pod data:", error);
         // Handle error - could set an error state here
@@ -40,11 +43,26 @@ const PodDetail: React.FC<PodDetailProps> = ({ id, onBack }) => {
     isLoading,
   } = useChat(id);
 
-  const handleJumpToTime = (time: number) => {
+  const handleJumpToTime = (time: number, videoPath?: string) => {
     console.log('Jump to time requested:', time);
-    setJumpToTime(time);
-    // Reset jumpToTime after a short delay to allow for multiple jumps to the same time
-    setTimeout(() => setJumpToTime(undefined), 100);
+    
+    // If a specific video path is provided, switch to that video first
+    if (videoPath) {
+      const newVideoUrl = getPublicVideoUrl(videoPath);
+      console.log('Switching to video:', newVideoUrl);
+      setCurrentVideoUrl(newVideoUrl);
+      setIsVideoReady(false); // Reset video ready state for new video
+      
+      // Wait a bit for video to load before jumping
+      setTimeout(() => {
+        setJumpToTime(time);
+        setTimeout(() => setJumpToTime(undefined), 100);
+      }, 500);
+    } else {
+      // Jump in current video
+      setJumpToTime(time);
+      setTimeout(() => setJumpToTime(undefined), 100);
+    }
   };
 
   const handleVideoReady = () => {
@@ -112,7 +130,7 @@ const PodDetail: React.FC<PodDetailProps> = ({ id, onBack }) => {
             {/* Video Player */}
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
               <VideoPlayer
-                videoUrl={getPublicVideoUrl(podData.video_path)}
+                videoUrl={currentVideoUrl}
                 jumpToTime={jumpToTime}
                 onVideoReady={handleVideoReady}
               />
