@@ -218,6 +218,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                           <Clock className="w-3 h-3 mr-1" />
                           Jump to video
                         </button>
+                    )}
 
                     {/* Feedback Buttons */}
                     {!isLoading && message.answer && (
