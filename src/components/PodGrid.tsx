@@ -62,6 +62,7 @@ const PodGrid: React.FC<PodGridProps> = ({
       // Add a small delay to show the opening animation before navigating
       setTimeout(
         () => {
+          console.log("Navigating to pod:", pod.id);
           onPodClick(pod);
           setClickedPodId(null);
         },

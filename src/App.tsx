@@ -17,19 +17,62 @@ import { getPods } from "./hooks/usePod";
 const SharedPodPage: React.FC = () => {
   const { podId } = useParams<{ podId: string }>();
   const navigate = useNavigate();
-  const [pods] = useState<Pod[]>(mockPods);
+  const [pod, setPod] = useState<PodResponseData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const pod = pods.find((p) => p.id === podId);
+  useEffect(() => {
+    const fetchPod = async () => {
+      if (!podId) {
+        setError("No pod ID provided");
+        setLoading(false);
+        return;
+      }
 
-  if (!pod) {
+      try {
+        setLoading(true);
+        const podData = await getPodById(podId);
+        setPod(podData);
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching pod:", err);
+        setError("Pod not found or failed to load");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPod();
+  }, [podId]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <h1 className="text-xl font-semibold text-gray-900 mb-2">
+            Loading Pod...
+          </h1>
+          <p className="text-gray-600">
+            Please wait while we fetch the pod details.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !pod) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            Pod Not Found
+            {error || "Pod Not Found"}
           </h1>
           <p className="text-gray-600 mb-6">
-            The pod you're looking for doesn't exist or has been removed.
+            {error === "No pod ID provided" 
+              ? "No pod ID was provided in the URL."
+              : "The pod you're looking for doesn't exist or failed to load."
+            }
           </p>
           <button
             onClick={() => navigate("/")}

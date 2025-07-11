@@ -21,11 +21,16 @@ const PodDetail: React.FC<PodDetailProps> = ({ id, onBack }) => {
 
   useEffect(() => {
     const getData = async () => {
-      const pods = await getPodById(id);
-      setPodData(pods);
+      try {
+        const podData = await getPodById(id);
+        setPodData(podData);
+      } catch (error) {
+        console.error("Error fetching pod data:", error);
+        // Handle error - could set an error state here
+      }
     };
     getData();
-  }, []);
+  }, [id]);
 
   const {
     messages,
