@@ -5,6 +5,7 @@ import { queryPodStreaming, submitQueryFeedback } from "../hooks/usePod";
 export const useChat = (id: string) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [videoUpdateCallback, setVideoUpdateCallback] = useState<((videoPath: string, timestamp: string) => void) | null>(null);
 
   const sendMessage = useCallback(
     async (question: string) => {
@@ -34,6 +35,15 @@ export const useChat = (id: string) => {
         let hasReceivedFirstChunk = false;
         
         await queryPodStreaming(id, question, (chunk) => {
+          // Handle immediate video update from first chunk
+          if (!hasReceivedFirstChunk && chunk.video_path && chunk.start_time !== undefined) {
+            console.log('First chunk received, updating video immediately:', chunk.video_path, chunk.start_time);
+            if (videoUpdateCallback) {
+              videoUpdateCallback(chunk.video_path, chunk.start_time.toString());
+            }
+            hasReceivedFirstChunk = true;
+          }
+          
           // Update the message with the new chunk response
           setMessages((prev) =>
             prev.map((msg) =>
@@ -42,17 +52,12 @@ export const useChat = (id: string) => {
                     ...msg,
                     answer: (msg.answer || '') + chunk.response,
                     // Only update video path and timestamp from the first chunk
-                    videoPath: hasReceivedFirstChunk ? msg.videoPath : chunk.video_path,
-                    timestamp: hasReceivedFirstChunk ? msg.timestamp : chunk.start_time?.toString() || msg.timestamp,
+                    videoPath: msg.videoPath || chunk.video_path,
+                    timestamp: msg.timestamp !== new Date().toISOString() ? msg.timestamp : chunk.start_time?.toString() || msg.timestamp,
                   }
                 : msg
             )
           );
-          
-          // Mark that we've received the first chunk
-          if (!hasReceivedFirstChunk) {
-            hasReceivedFirstChunk = true;
-          }
         });
       } catch (error) {
         console.error("Error querying knowledge base:", error);
@@ -72,8 +77,12 @@ export const useChat = (id: string) => {
         setIsLoading(false);
       }
     },
-    [id]
+    [id, videoUpdateCallback]
   );
+
+  const onVideoUpdate = useCallback((callback: (videoPath: string, timestamp: string) => void) => {
+    setVideoUpdateCallback(() => callback);
+  }, []);
 
   const submitFeedback = useCallback(
     async (
@@ -147,5 +156,6 @@ export const useChat = (id: string) => {
     sendMessage,
     submitFeedback,
     clearChat,
+    onVideoUpdate,
   };
 };

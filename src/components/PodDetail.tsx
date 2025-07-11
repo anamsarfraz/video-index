@@ -42,21 +42,29 @@ const PodDetail: React.FC<PodDetailProps> = ({ id, onBack }) => {
     sendMessage,
     submitFeedback: addFeedback,
     isLoading,
+    onVideoUpdate,
   } = useChat(id);
 
-  // Auto-seek when new messages arrive with video content
+  // Handle immediate video updates from streaming
   useEffect(() => {
-    if (messages.length > 0 && !isLoading) {
-      const lastMessage = messages[messages.length - 1];
-      if (lastMessage.type === 'ai' && lastMessage.videoPath && lastMessage.timestamp) {
-        const timeInSeconds = parseFloat(lastMessage.timestamp);
-        if (!isNaN(timeInSeconds) && timeInSeconds > 0) {
-          console.log('Auto-seeking to:', timeInSeconds, 'in video:', lastMessage.videoPath);
-          handleJumpToTime(timeInSeconds, lastMessage.videoPath);
+    if (onVideoUpdate) {
+      onVideoUpdate((videoPath: string, timestamp: string) => {
+        console.log('Immediate video update:', videoPath, timestamp);
+        const newVideoUrl = getPublicVideoUrl(videoPath);
+        if (newVideoUrl !== currentVideoUrl) {
+          setCurrentVideoUrl(newVideoUrl);
+          setIsVideoReady(false);
         }
-      }
+        
+        // Store the timestamp for later seeking
+        const timeInSeconds = parseFloat(timestamp);
+        if (!isNaN(timeInSeconds) && timeInSeconds > 0) {
+          setPendingSeek({ time: timeInSeconds, videoPath });
+        }
+      });
     }
-  }, [messages, isLoading]);
+  }, [onVideoUpdate, currentVideoUrl]);
+
 
   const handleJumpToTime = (time: number, videoPath?: string) => {
     console.log('Jump to time requested:', time);
