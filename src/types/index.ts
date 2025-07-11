@@ -23,18 +23,25 @@ export interface PodResponseData {
   introduction: string;
 }
 
+export interface QueryResponse {
+  knowledge_base: string;
+  query: string;
+  response: string;
+  video_path: string;
+  image_path: string[];
+  start_time: string;
+  end_time: string;
+}
+
 export interface ChatMessage {
-  id: string;
+  id?: string;
   question: string;
   answer: string;
-  videoSnippet?: {
-    start: number;
-    end: number;
-  };
+  videoPath: string;
   feedback?: "like" | "dislike";
   feedbackText?: string;
   feedbackCategory?: string;
-  timestamp: Date;
+  timestamp: string;
 }
 
 export interface FilterOption {

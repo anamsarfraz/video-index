@@ -1,13 +1,27 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Mic, ThumbsUp, ThumbsDown, Clock, Brain, Search, Zap } from 'lucide-react';
-import { ChatMessage } from '../types';
-import FeedbackModal from './FeedbackModal';
+import React, { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Send,
+  Mic,
+  ThumbsUp,
+  ThumbsDown,
+  Clock,
+  Brain,
+  Search,
+  Zap,
+} from "lucide-react";
+import { ChatMessage } from "../types";
+import FeedbackModal from "./FeedbackModal";
 
 interface ChatInterfaceProps {
   messages: ChatMessage[];
   onSendMessage: (message: string) => void;
-  onFeedback: (messageId: string, feedback: 'like' | 'dislike', feedbackText?: string, category?: string) => void;
+  onFeedback: (
+    messageId: string,
+    feedback: "like" | "dislike",
+    feedbackText?: string,
+    category?: string
+  ) => void;
   isLoading?: boolean;
   onJumpToTime?: (time: number) => void;
 }
@@ -16,21 +30,24 @@ const statusMessages = [
   { text: "Processing your question...", icon: Brain, duration: 800 },
   { text: "Searching knowledge base...", icon: Search, duration: 600 },
   { text: "Analyzing video content...", icon: Zap, duration: 700 },
-  { text: "Generating response...", icon: Brain, duration: 500 }
+  { text: "Generating response...", icon: Brain, duration: 500 },
 ];
 const ChatInterface: React.FC<ChatInterfaceProps> = ({
   messages,
   onSendMessage,
   onFeedback,
   isLoading,
-  onJumpToTime
+  onJumpToTime,
 }) => {
-  const [inputMessage, setInputMessage] = useState('');
+  const [inputMessage, setInputMessage] = useState("");
   const [isRecording, setIsRecording] = useState(false);
-  const [currentStatus, setCurrentStatus] = useState<{ text: string; icon: any } | null>(null);
+  const [currentStatus, setCurrentStatus] = useState<{
+    text: string;
+    icon: any;
+  } | null>(null);
   const [statusIndex, setStatusIndex] = useState(0);
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
-  const [selectedMessageId, setSelectedMessageId] = useState<string>('');
+  const [selectedMessageId, setSelectedMessageId] = useState<string>("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -43,16 +60,16 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     if (isLoading) {
       setStatusIndex(0);
       setCurrentStatus(statusMessages[0]);
-      
+
       const progressStatus = () => {
         let currentIndex = 0;
-        
+
         const showNextStatus = () => {
           if (currentIndex < statusMessages.length && isLoading) {
             const status = statusMessages[currentIndex];
             setCurrentStatus(status);
             setStatusIndex(currentIndex);
-            
+
             setTimeout(() => {
               currentIndex++;
               if (currentIndex < statusMessages.length) {
@@ -61,10 +78,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             }, status.duration);
           }
         };
-        
+
         showNextStatus();
       };
-      
+
       progressStatus();
     } else {
       setCurrentStatus(null);
@@ -72,14 +89,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     }
   }, [isLoading]);
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (inputMessage.trim()) {
       onSendMessage(inputMessage.trim());
-      setInputMessage('');
+      setInputMessage("");
     }
   };
 
@@ -94,15 +111,15 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   };
 
   const handleFeedbackSubmit = (feedbackText: string, category: string) => {
-    onFeedback(selectedMessageId, 'dislike', feedbackText, category);
+    onFeedback(selectedMessageId, "dislike", feedbackText, category);
     setFeedbackModalOpen(false);
-    setSelectedMessageId('');
+    setSelectedMessageId("");
   };
 
   const formatTimestamp = (date: Date) => {
-    return date.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit'
+    return date.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -111,7 +128,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       {/* Header */}
       <div className="bg-white border-b border-gray-200 p-4 rounded-t-lg">
         <h3 className="font-semibold text-gray-900">Q&A Chat</h3>
-        <p className="text-sm text-gray-500">Ask questions about the video content</p>
+        <p className="text-sm text-gray-500">
+          Ask questions about the video content
+        </p>
       </div>
 
       {/* Messages */}
@@ -130,9 +149,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
               <div className="flex justify-end">
                 <div className="max-w-xs bg-blue-600 text-white rounded-lg px-4 py-2">
                   <p className="text-sm">{message.question}</p>
-                  <p className="text-xs text-blue-100 mt-1">
+                  {/* <p className="text-xs text-blue-100 mt-1">
                     {formatTimestamp(message.timestamp)}
-                  </p>
+                  </p> */}
                 </div>
               </div>
 
@@ -140,9 +159,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
               <div className="flex justify-start">
                 <div className="max-w-sm bg-white rounded-lg px-4 py-3 shadow-sm border border-gray-200">
                   <p className="text-sm text-gray-800 mb-2">{message.answer}</p>
-                  
+
                   {/* Video Snippet */}
-                  {message.videoSnippet && (
+                  {/* {message.videoSnippet && (
                     <button
                       onClick={() => onJumpToTime?.(message.videoSnippet!.start)}
                       className="flex items-center text-xs text-blue-600 hover:text-blue-700 transition-colors duration-200 mb-2"
@@ -150,35 +169,35 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                       <Clock className="w-3 h-3 mr-1" />
                       Jump to {Math.floor(message.videoSnippet.start / 60)}:{(message.videoSnippet.start % 60).toString().padStart(2, '0')}
                     </button>
-                  )}
+                  )} */}
 
                   {/* Feedback Buttons */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
                       <button
-                        onClick={() => onFeedback(message.id, 'like')}
+                        onClick={() => onFeedback(message.id!, "like")}
                         className={`p-1 rounded transition-colors duration-200 ${
-                          message.feedback === 'like'
-                            ? 'text-green-600 bg-green-50'
-                            : 'text-gray-400 hover:text-green-600'
+                          message.feedback === "like"
+                            ? "text-green-600 bg-green-50"
+                            : "text-gray-400 hover:text-green-600"
                         }`}
                       >
                         <ThumbsUp className="w-3 h-3" />
                       </button>
                       <button
-                        onClick={() => handleThumbsDown(message.id)}
+                        onClick={() => handleThumbsDown(message.id!)}
                         className={`p-1 rounded transition-colors duration-200 ${
-                          message.feedback === 'dislike'
-                            ? 'text-red-600 bg-red-50'
-                            : 'text-gray-400 hover:text-red-600'
+                          message.feedback === "dislike"
+                            ? "text-red-600 bg-red-50"
+                            : "text-gray-400 hover:text-red-600"
                         }`}
                       >
                         <ThumbsDown className="w-3 h-3" />
                       </button>
                     </div>
-                    <span className="text-xs text-gray-500">
+                    {/* <span className="text-xs text-gray-500">
                       {formatTimestamp(message.timestamp)}
-                    </span>
+                    </span> */}
                   </div>
                 </div>
               </div>
@@ -194,7 +213,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             exit={{ opacity: 0, y: -10 }}
             className="flex justify-start"
           >
-            <motion.div 
+            <motion.div
               className="bg-white rounded-lg px-4 py-3 shadow-sm border border-gray-200 max-w-sm"
               key={statusIndex}
               initial={{ opacity: 0, x: -10 }}
@@ -206,20 +225,20 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 {/* Animated Status Icon */}
                 <motion.div
                   className="flex-shrink-0"
-                  animate={{ 
+                  animate={{
                     rotate: [0, 360],
-                    scale: [1, 1.1, 1]
+                    scale: [1, 1.1, 1],
                   }}
-                  transition={{ 
+                  transition={{
                     rotate: { duration: 2, repeat: Infinity, ease: "linear" },
-                    scale: { duration: 1, repeat: Infinity, ease: "easeInOut" }
+                    scale: { duration: 1, repeat: Infinity, ease: "easeInOut" },
                   }}
                 >
                   <currentStatus.icon className="w-4 h-4 text-blue-600" />
                 </motion.div>
-                
+
                 {/* Status Text with Typing Effect */}
-                <motion.span 
+                <motion.span
                   className="text-sm text-gray-600 font-medium"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -227,7 +246,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 >
                   {currentStatus.text}
                 </motion.span>
-                
+
                 {/* Subtle Progress Dots */}
                 <div className="flex space-x-1 ml-auto">
                   {[...Array(3)].map((_, i) => (
@@ -242,7 +261,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                         duration: 0.8,
                         repeat: Infinity,
                         delay: i * 0.2,
-                        ease: "easeInOut"
+                        ease: "easeInOut",
                       }}
                     />
                   ))}
@@ -256,7 +275,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       </div>
 
       {/* Input Form */}
-      <form onSubmit={handleSubmit} className="p-4 bg-white border-t border-gray-200 rounded-b-lg">
+      <form
+        onSubmit={handleSubmit}
+        className="p-4 bg-white border-t border-gray-200 rounded-b-lg"
+      >
         <div className="flex items-center space-x-2">
           <div className="flex-1 relative">
             <input
@@ -268,19 +290,19 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
               className="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
-          
+
           <button
             type="button"
             onClick={handleVoiceRecord}
             className={`p-2 rounded-full transition-colors duration-200 ${
               isRecording
-                ? 'bg-red-600 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ? "bg-red-600 text-white"
+                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
             }`}
           >
             <Mic className="w-5 h-5" />
           </button>
-          
+
           <button
             type="submit"
             disabled={!inputMessage.trim() || isLoading}

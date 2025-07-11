@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, ExternalLink, Share2 } from "lucide-react";
-import { Pod, PodResponseData } from "../types";
+import { ArrowLeft, Share2 } from "lucide-react";
+import { PodResponseData } from "../types";
 import { useChat } from "../hooks/useChat";
-import { mockChatMessages } from "../utils/mockData";
 import VideoPlayer from "./VideoPlayer";
 import ChatInterface from "./ChatInterface";
 import ShareModal from "./ShareModal";
@@ -28,8 +27,7 @@ const PodDetail: React.FC<PodDetailProps> = ({ id, onBack }) => {
     getData();
   }, []);
 
-  const { messages, sendMessage, addFeedback, isLoading } =
-    useChat(mockChatMessages);
+  const { messages, sendMessage, addFeedback, isLoading } = useChat(id);
 
   const handleJumpToTime = (time: number) => {
     setJumpToTime(time);
