@@ -183,7 +183,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                     </div>
 
                     {/* Video Timestamp */}
-                    {message.timestamp && (
+                    {message.timestamp && !isLoading && (
                       (() => {
                         // Try to parse timestamp as number (seconds)
                         const timeInSeconds = parseFloat(message.timestamp);
@@ -206,7 +206,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                     )}
 
                     {/* Alternative: Show start_time if available in message */}
-                    {message.videoPath && !message.timestamp && (
+                    {message.videoPath && !message.timestamp && !isLoading && (
                         <button
                           onClick={() => {
                             // If we have video path but no timestamp, jump to beginning

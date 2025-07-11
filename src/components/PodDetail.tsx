@@ -46,7 +46,7 @@ const PodDetail: React.FC<PodDetailProps> = ({ id, onBack }) => {
 
   // Auto-seek when new messages arrive with video content
   useEffect(() => {
-    if (messages.length > 0) {
+    if (messages.length > 0 && !isLoading) {
       const lastMessage = messages[messages.length - 1];
       if (lastMessage.type === 'ai' && lastMessage.videoPath && lastMessage.timestamp) {
         const timeInSeconds = parseFloat(lastMessage.timestamp);
@@ -56,7 +56,7 @@ const PodDetail: React.FC<PodDetailProps> = ({ id, onBack }) => {
         }
       }
     }
-  }, [messages]);
+  }, [messages, isLoading]);
 
   const handleJumpToTime = (time: number, videoPath?: string) => {
     console.log('Jump to time requested:', time);

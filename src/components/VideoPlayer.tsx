@@ -113,11 +113,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, onTimeUpdate, jumpT
       console.log('Jumping to time:', jumpToTime, 'Video ready:', isVideoReady);
       videoRef.current.currentTime = jumpToTime;
       setCurrentTime(jumpToTime);
-      
-      // Auto-play after seeking
-      if (!isPlaying) {
-        videoRef.current.play().catch(console.error);
-      }
     }
   }, [jumpToTime, isVideoReady]);
 

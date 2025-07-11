@@ -31,6 +31,8 @@ export const useChat = (id: string) => {
       setMessages((prev) => [...prev, initialAiMessage]);
 
       try {
+        let hasReceivedFirstChunk = false;
+        
         await queryPodStreaming(id, question, (chunk) => {
           // Update the message with the new chunk response
           setMessages((prev) =>
@@ -39,12 +41,18 @@ export const useChat = (id: string) => {
                 ? {
                     ...msg,
                     answer: (msg.answer || '') + chunk.response,
-                    videoPath: chunk.video_path,
-                    timestamp: chunk.start_time?.toString() || msg.timestamp,
+                    // Only update video path and timestamp from the first chunk
+                    videoPath: hasReceivedFirstChunk ? msg.videoPath : chunk.video_path,
+                    timestamp: hasReceivedFirstChunk ? msg.timestamp : chunk.start_time?.toString() || msg.timestamp,
                   }
                 : msg
             )
           );
+          
+          // Mark that we've received the first chunk
+          if (!hasReceivedFirstChunk) {
+            hasReceivedFirstChunk = true;
+          }
         });
       } catch (error) {
         console.error("Error querying knowledge base:", error);
