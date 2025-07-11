@@ -52,8 +52,8 @@ export const useChat = (id: string) => {
                     ...msg,
                     answer: (msg.answer || '') + chunk.response,
                     // Set video path and timestamp only from the first chunk
-                    videoPath: hasReceivedFirstChunk ? (msg.videoPath || chunk.video_path) : msg.videoPath,
-                    timestamp: hasReceivedFirstChunk ? (msg.timestamp !== new Date().toISOString() ? msg.timestamp : chunk.start_time?.toString() || msg.timestamp) : msg.timestamp,
+                    videoPath: msg.videoPath || (hasReceivedFirstChunk ? chunk.video_path : undefined),
+                    timestamp: msg.timestamp !== new Date().toISOString() ? msg.timestamp : (hasReceivedFirstChunk ? chunk.start_time?.toString() : undefined),
                   }
                 : msg
             )
