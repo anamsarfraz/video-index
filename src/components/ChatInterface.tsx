@@ -116,11 +116,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     setSelectedMessageId("");
   };
 
-  const formatTimestamp = (date: Date) => {
-    return date.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
   return (
@@ -138,69 +137,84 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         <AnimatePresence>
           {messages.map((message, index) => (
             <motion.div
-              key={message.id}
+              key={message.id || `message-${index}`}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3, delay: index * 0.1 }}
               className="space-y-3"
             >
-              {/* Question */}
-              <div className="flex justify-end">
-                <div className="max-w-xs bg-blue-600 text-white rounded-lg px-4 py-2">
-                  <p className="text-sm">{message.question}</p>
-                  {/* <p className="text-xs text-blue-100 mt-1">
-                    {formatTimestamp(message.timestamp)}
-                  </p> */}
-                </div>
-              </div>
-
-              {/* Answer */}
-              <div className="flex justify-start">
-                <div className="max-w-sm bg-white rounded-lg px-4 py-3 shadow-sm border border-gray-200">
-                  <p className="text-sm text-gray-800 mb-2">{message.answer}</p>
-
-                  {/* Video Snippet */}
-                  {/* {message.videoSnippet && (
-                    <button
-                      onClick={() => onJumpToTime?.(message.videoSnippet!.start)}
-                      className="flex items-center text-xs text-blue-600 hover:text-blue-700 transition-colors duration-200 mb-2"
-                    >
-                      <Clock className="w-3 h-3 mr-1" />
-                      Jump to {Math.floor(message.videoSnippet.start / 60)}:{(message.videoSnippet.start % 60).toString().padStart(2, '0')}
-                    </button>
-                  )} */}
-
-                  {/* Feedback Buttons */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => onFeedback(message.id!, "like")}
-                        className={`p-1 rounded transition-colors duration-200 ${
-                          message.feedback === "like"
-                            ? "text-green-600 bg-green-50"
-                            : "text-gray-400 hover:text-green-600"
-                        }`}
-                      >
-                        <ThumbsUp className="w-3 h-3" />
-                      </button>
-                      <button
-                        onClick={() => handleThumbsDown(message.id!)}
-                        className={`p-1 rounded transition-colors duration-200 ${
-                          message.feedback === "dislike"
-                            ? "text-red-600 bg-red-50"
-                            : "text-gray-400 hover:text-red-600"
-                        }`}
-                      >
-                        <ThumbsDown className="w-3 h-3" />
-                      </button>
-                    </div>
-                    {/* <span className="text-xs text-gray-500">
-                      {formatTimestamp(message.timestamp)}
-                    </span> */}
+              {message.type === "user" ? (
+                // User message
+                <div className="flex justify-end">
+                  <div className="max-w-xs bg-blue-600 text-white rounded-lg px-4 py-2">
+                    <p className="text-sm">{message.question}</p>
+                    <p className="text-xs text-blue-100 mt-1">
+                      {new Date(message.timestamp).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </p>
                   </div>
                 </div>
-              </div>
+              ) : (
+                // AI message
+                <div className="flex justify-start">
+                  <div className="max-w-sm bg-white rounded-lg px-4 py-3 shadow-sm border border-gray-200">
+                    <p className="text-sm text-gray-800 mb-2">
+                      {message.answer}
+                    </p>
+
+                    {/* Video Timestamp */}
+                    {message.timestamp &&
+                      !isNaN(parseFloat(message.timestamp)) && (
+                        <button
+                          onClick={() =>
+                            onJumpToTime?.(parseFloat(message.timestamp))
+                          }
+                          className="flex items-center text-xs text-blue-600 hover:text-blue-700 transition-colors duration-200 mb-2"
+                        >
+                          <Clock className="w-3 h-3 mr-1" />
+                          {`Jump to ${formatTime(
+                            parseFloat(message.timestamp)
+                          )}`}
+                        </button>
+                      )}
+
+                    {/* Feedback Buttons */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => onFeedback(message.id!, "like")}
+                          className={`p-1 rounded transition-colors duration-200 ${
+                            message.feedback === "like"
+                              ? "text-green-600 bg-green-50"
+                              : "text-gray-400 hover:text-green-600"
+                          }`}
+                        >
+                          <ThumbsUp className="w-3 h-3" />
+                        </button>
+                        <button
+                          onClick={() => handleThumbsDown(message.id!)}
+                          className={`p-1 rounded transition-colors duration-200 ${
+                            message.feedback === "dislike"
+                              ? "text-red-600 bg-red-50"
+                              : "text-gray-400 hover:text-red-600"
+                          }`}
+                        >
+                          <ThumbsDown className="w-3 h-3" />
+                        </button>
+                      </div>
+                      <span className="text-xs text-gray-500">
+                        {new Date(message.timestamp).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </motion.div>
           ))}
         </AnimatePresence>
