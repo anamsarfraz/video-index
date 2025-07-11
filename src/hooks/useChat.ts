@@ -93,9 +93,9 @@ export const useChat = (id: string) => {
           msg.id === messageId
             ? {
                 ...msg,
-                feedback,
+                answer: (msg.answer || '') + chunk.response,
                 feedbackComment: feedbackText,
-                feedbackCategory: category,
+                timestamp: chunk.start_time?.toString() || new Date().toISOString(),
               }
             : msg
         )

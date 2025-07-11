@@ -73,7 +73,10 @@ export const queryPodStreaming = async (
           try {
             const chunk = JSON.parse(trimmedLine) as QueryResponse;
             console.log("Received streaming chunk:", chunk);
-            onChunk(chunk);
+            // Only call onChunk if there's actual response content or it's the first chunk
+            if (chunk.response !== undefined) {
+              onChunk(chunk);
+            }
           } catch (parseError) {
             console.warn("Failed to parse streaming chunk:", trimmedLine, parseError);
           }
