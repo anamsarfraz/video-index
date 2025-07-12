@@ -12,6 +12,7 @@ import PodDetail from "./components/PodDetail";
 import PerformanceDebugger from "./components/PerformanceDebugger";
 import ShareModal from "./components/ShareModal";
 import { getPods, getPodById } from "./hooks/usePod";
+import { getUserSessionId } from "./utils/cookieUtils";
 
 // Shared Pod Page Component
 const SharedPodPage: React.FC = () => {
@@ -69,10 +70,9 @@ const SharedPodPage: React.FC = () => {
             {error || "Pod Not Found"}
           </h1>
           <p className="text-gray-600 mb-6">
-            {error === "No pod ID provided" 
+            {error === "No pod ID provided"
               ? "No pod ID was provided in the URL."
-              : "The pod you're looking for doesn't exist or failed to load."
-            }
+              : "The pod you're looking for doesn't exist or failed to load."}
           </p>
           <button
             onClick={() => navigate("/")}
@@ -258,6 +258,13 @@ const HomePage: React.FC = () => {
 
 function App() {
   const [showPerformanceDebugger, setShowPerformanceDebugger] = useState(false);
+
+  useEffect(() => {
+    const sessionId = getUserSessionId();
+    console.log("User Session ID:", sessionId);
+    // You can now use this sessionId for tracking, analytics, or sending to your backend
+    // For example, you might pass it to an analytics service or include it in API headers.
+  }, []);
 
   // Performance debugging toggle (for development)
   React.useEffect(() => {
