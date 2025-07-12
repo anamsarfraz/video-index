@@ -10,9 +10,10 @@ export const getUserSessionId = (): string => {
   if (!sessionId) {
     sessionId = uuid4();
     Cookies.set(SESSION_COOKIE_NAME, sessionId, {
-      expires: 30, // Cookie expires in 30 days
-      secure: true, // Only send cookie over HTTPS
-      sameSite: "None", // Allow cookie to be sent with cross-site requests
+      expires: 30,
+      secure: true,
+      sameSite: "None", // Required for cross-site
+      domain: ".videoindex.app", // 👈 Add your common parent domain
     });
   }
 
