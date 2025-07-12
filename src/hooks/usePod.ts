@@ -6,7 +6,10 @@ const API_BASE_URL = "https://api.videoindex.app";
 
 export const getPods = async (): Promise<Pod[]> => {
   const response = await axios.get<Pod[]>(
-    `https://api.videoindex.app/knowledge-bases`
+    `https://api.videoindex.app/knowledge-bases`,
+    {
+      withCredentials: true,
+    }
   );
   console.log("Pods fetched: ", response.data);
   return response.data;
@@ -25,7 +28,9 @@ export const getPodById = async (id: string): Promise<PodResponseData> => {
       if (error.response?.status === 404) {
         throw new Error("Pod not found");
       }
-      throw new Error(`Failed to fetch pod: ${error.response?.statusText || error.message}`);
+      throw new Error(
+        `Failed to fetch pod: ${error.response?.statusText || error.message}`
+      );
     }
     throw new Error("Failed to fetch pod");
   }
@@ -37,12 +42,17 @@ export const queryPodStreaming = async (
   onChunk: (chunk: QueryResponse) => void,
   max_results: number = 5
 ): Promise<void> => {
-  console.log("Streaming query for pod with ID:", knowledge_base_id, "and query:", query);
-  
+  console.log(
+    "Streaming query for pod with ID:",
+    knowledge_base_id,
+    "and query:",
+    query
+  );
+
   const response = await fetch(`${API_BASE_URL}/query`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
       knowledge_base_id: Number(knowledge_base_id),
@@ -57,29 +67,29 @@ export const queryPodStreaming = async (
 
   const reader = response.body?.getReader();
   if (!reader) {
-    throw new Error('No response body reader available');
+    throw new Error("No response body reader available");
   }
 
   const decoder = new TextDecoder();
-  let buffer = '';
+  let buffer = "";
 
   try {
     while (true) {
       const { done, value } = await reader.read();
-      
+
       if (done) {
         break;
       }
 
       // Decode the chunk and add to buffer
       buffer += decoder.decode(value, { stream: true });
-      
+
       // Process complete lines (JSON objects separated by newlines)
-      const lines = buffer.split('\n');
-      
+      const lines = buffer.split("\n");
+
       // Keep the last incomplete line in the buffer
-      buffer = lines.pop() || '';
-      
+      buffer = lines.pop() || "";
+
       // Process each complete line
       for (const line of lines) {
         const trimmedLine = line.trim();
@@ -89,7 +99,11 @@ export const queryPodStreaming = async (
             console.log("Received streaming chunk:", chunk);
             onChunk(chunk);
           } catch (parseError) {
-            console.warn("Failed to parse JSON chunk:", trimmedLine, parseError);
+            console.warn(
+              "Failed to parse JSON chunk:",
+              trimmedLine,
+              parseError
+            );
           }
         }
       }
