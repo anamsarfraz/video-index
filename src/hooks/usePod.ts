@@ -21,7 +21,12 @@ export const getPods = async (): Promise<Pod[]> => {
 export const getPodById = async (id: string): Promise<PodResponseData> => {
   try {
     const response = await axios.get<PodResponseData>(
-      `${API_BASE_URL}/knowledge-bases/${id}`
+      `${API_BASE_URL}/knowledge-bases/${id}`,
+      {
+        headers: {
+          "X-Session-Token": getUserSessionId(),
+        },
+      }
     );
     console.log("Pod fetched: ", response.data);
     return response.data;
@@ -56,6 +61,7 @@ export const queryPodStreaming = async (
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "X-Session-Token": getUserSessionId(),
     },
     body: JSON.stringify({
       knowledge_base_id: Number(knowledge_base_id),
@@ -121,11 +127,19 @@ export const queryPod = async (
   max_results: number = 5
 ): Promise<QueryResponse> => {
   console.log("Querying pod with ID:", knowledge_base_id, "and query:", query);
-  const response = await axios.post<QueryResponse>(`${API_BASE_URL}/query`, {
-    knowledge_base_id: Number(knowledge_base_id),
-    query,
-    max_results,
-  });
+  const response = await axios.post<QueryResponse>(
+    `${API_BASE_URL}/query`,
+    {
+      knowledge_base_id: Number(knowledge_base_id),
+      query,
+      max_results,
+    },
+    {
+      headers: {
+        "X-Session-Token": getUserSessionId(),
+      },
+    }
+  );
   console.log("Pod query result: ", response.data);
   return response.data;
 };
@@ -140,7 +154,12 @@ export const submitQueryFeedback = async (feedbackData: {
   console.log("Submitting feedback with data:", feedbackData);
   const response = await axios.post(
     `${API_BASE_URL}/query-feedback`,
-    feedbackData
+    feedbackData,
+    {
+      headers: {
+        "X-Session-Token": getUserSessionId(),
+      },
+    }
   );
   console.log("Feedback submission result: ", response.data);
   return { success: response.data.success };
