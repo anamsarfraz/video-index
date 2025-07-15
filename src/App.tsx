@@ -34,6 +34,7 @@ const SharedPodPage: React.FC = () => {
         setLoading(true);
         const podData = await getPodById(podId);
         setPod(podData);
+        setLoading(false);
         setError(null);
       } catch (err) {
         console.error("Error fetching pod:", err);
@@ -62,7 +63,7 @@ const SharedPodPage: React.FC = () => {
     );
   }
 
-  if (error || !pod) {
+  if (error) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
