@@ -164,3 +164,27 @@ export const submitQueryFeedback = async (feedbackData: {
   console.log("Feedback submission result: ", response.data);
   return { success: response.data.success };
 };
+
+export const getUsage = async (): Promise<
+  Record<string, { queries: number }>
+> => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/usage`, {
+      headers: {
+        "X-Session-Token": getUserSessionId(),
+      },
+    });
+
+    const usageData: Record<string, { queries: number }> = {};
+    for (const [key, value] of Object.entries(response.data.usage)) {
+      if (key.startsWith("pod_")) {
+        usageData[key] = { queries: (value as any).queries || 0 };
+      }
+    }
+
+    return usageData;
+  } catch (error) {
+    console.error("Error fetching usage data:", error);
+    throw new Error("Failed to fetch usage data");
+  }
+};

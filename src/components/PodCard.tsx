@@ -292,10 +292,10 @@ const PodCard: React.FC<PodCardProps> = memo(
               </div> */}
 
                 {/* Interactions Count */}
-                {/* <div className="flex items-center text-gray-500">
-                <Eye className="w-3 h-3 mr-1" />
-                <span className="font-medium">{pod.interactions}</span>
-              </div> */}
+                <div className="flex items-center text-gray-500">
+                  <Eye className="w-3 h-3 mr-1" />
+                  <span className="font-medium">{pod.queries}</span>
+                </div>
               </div>
             </div>
           </motion.div>

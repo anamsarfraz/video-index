@@ -3,6 +3,7 @@ export interface Pod {
   title: string;
   tags: string[];
   image: string;
+  queries: number;
   //description: string;
   //thumbnail: string;
   //category: string;

@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Routes, Route, useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Pod, CreatePodFormData } from "./types";
+import { Pod, CreatePodFormData, PodResponseData } from "./types";
 import { mockPods } from "./utils/mockData";
 import { useModal } from "./hooks/useModal";
 import Hero from "./components/Hero";
@@ -11,7 +11,7 @@ import CreatePodModal from "./components/CreatePodModal";
 import PodDetail from "./components/PodDetail";
 import PerformanceDebugger from "./components/PerformanceDebugger";
 import ShareModal from "./components/ShareModal";
-import { getPods, getPodById } from "./hooks/usePod";
+import { getPods, getPodById, getUsage } from "./hooks/usePod";
 import { getUserSessionId } from "./utils/cookieUtils";
 
 // Shared Pod Page Component
@@ -96,6 +96,10 @@ const HomePage: React.FC = () => {
   const [filterOption, setFilterOption] = useState("recent");
   const [showHero, setShowHero] = useState(true);
   const [shareModalPod, setShareModalPod] = useState<Pod | null>(null);
+  const [usageData, setUsageData] = useState<Record<
+    string,
+    { queries: number }
+  > | null>(null);
 
   // Moved useModal to top level - always called unconditionally
   const {
@@ -105,11 +109,33 @@ const HomePage: React.FC = () => {
   } = useModal();
 
   useEffect(() => {
-    const getData = async () => {
-      const pods = await getPods();
-      setPods(pods);
+    const fetchData = async () => {
+      try {
+        const [podsData, usageResponse] = await Promise.all([
+          getPods(),
+          getUsage(),
+        ]);
+
+        setUsageData(usageResponse);
+
+        // Merge query counts with pods
+        const mergedPods = podsData.map((pod) => {
+          const usageKey = `pod_${pod.id}`;
+          const queryCount = usageResponse[usageKey]?.queries || 0;
+
+          return {
+            ...pod,
+            queries: queryCount,
+          };
+        });
+
+        setPods(mergedPods);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
     };
-    getData();
+
+    fetchData();
   }, []);
 
   // Filter and sort pods
@@ -149,6 +175,7 @@ const HomePage: React.FC = () => {
       title: formData.title,
       tags: ["Demo tags"],
       image: "image_path",
+      queries: 0,
       //description: formData.description,
       //thumbnail: `https://images.pexels.com/photos/${Math.floor(Math.random() * 1000000)}/pexels-photo-${Math.floor(Math.random() * 1000000)}.jpeg?auto=compress&cs=tinysrgb&w=400`,
       //category: 'General',
@@ -262,8 +289,6 @@ function App() {
   useEffect(() => {
     const sessionId = getUserSessionId();
     console.log("User Session ID:", sessionId);
-    // You can now use this sessionId for tracking, analytics, or sending to your backend
-    // For example, you might pass it to an analytics service or include it in API headers.
   }, []);
 
   // Performance debugging toggle (for development)
