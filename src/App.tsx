@@ -1,8 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Routes, Route, useNavigate, useParams } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Pod, CreatePodFormData, PodResponseData } from "./types";
-import { mockPods } from "./utils/mockData";
 import { useModal } from "./hooks/useModal";
 import Hero from "./components/Hero";
 import SearchFilter from "./components/SearchFilter";
@@ -86,7 +85,7 @@ const SharedPodPage: React.FC = () => {
     );
   }
 
-  return <PodDetail id={pod.id} onBack={() => navigate("/")} />;
+  return <PodDetail id={pod!.id} onBack={() => navigate("/")} />;
 };
 
 // Home Page Component
@@ -108,6 +107,8 @@ const HomePage: React.FC = () => {
     openModal: openCreateModal,
     closeModal: closeCreateModal,
   } = useModal();
+
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -235,6 +236,12 @@ const HomePage: React.FC = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  // if (pods == null) {
+  //   return (
+
+  //   );
+  // }
+
   return (
     <>
       {/* Hero Section */}
@@ -260,12 +267,118 @@ const HomePage: React.FC = () => {
       />
 
       {/* Pod Grid */}
-      <PodGrid
-        pods={filteredPods}
-        onPodClick={handlePodClick}
-        onToggleFollow={handleToggleFollow}
-        onShare={handlePodShare}
-      />
+
+      {pods == null ? (
+        <motion.div
+          className="text-center py-20"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{
+            duration: prefersReducedMotion ? 0.2 : 0.6,
+            ease: "easeOut",
+          }}
+        >
+          <motion.div
+            className="w-32 h-32 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg"
+            animate={
+              prefersReducedMotion
+                ? undefined
+                : {
+                    scale: [1, 1.05, 1],
+                    rotate: [0, 5, -5, 0],
+                  }
+            }
+            transition={
+              prefersReducedMotion
+                ? undefined
+                : {
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }
+            }
+          >
+            {/* Replaced Pla with a simple SVG spinner */}
+            <svg
+              className="animate-spin h-12 w-12 text-blue-600"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+          </motion.div>
+
+          <motion.h3
+            className="text-2xl font-bold text-gray-700 mb-3"
+            initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              delay: prefersReducedMotion ? 0 : 0.2,
+              duration: prefersReducedMotion ? 0.2 : 0.5,
+            }}
+          >
+            Fetching pods...
+          </motion.h3>
+
+          <motion.p
+            className="text-gray-500 text-lg"
+            initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              delay: prefersReducedMotion ? 0 : 0.4,
+              duration: prefersReducedMotion ? 0.2 : 0.5,
+            }}
+          >
+            Please wait while we load your data.
+          </motion.p>
+
+          {/* Animated dots for loading indicator */}
+          {!prefersReducedMotion && (
+            <motion.div
+              className="flex justify-center space-x-2 mt-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6, duration: 0.5 }}
+            >
+              {[...Array(3)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="w-2 h-2 bg-blue-400 rounded-full"
+                  animate={{
+                    scale: [1, 1.5, 1],
+                    opacity: [0.5, 1, 0.5],
+                  }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    delay: i * 0.2,
+                  }}
+                />
+              ))}
+            </motion.div>
+          )}
+        </motion.div>
+      ) : (
+        <PodGrid
+          pods={filteredPods}
+          onPodClick={handlePodClick}
+          onToggleFollow={handleToggleFollow}
+          onShare={handlePodShare}
+        />
+      )}
 
       {/* Create Pod Modal */}
       <CreatePodModal
