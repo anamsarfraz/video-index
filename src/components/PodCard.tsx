@@ -202,23 +202,44 @@ const PodCard: React.FC<PodCardProps> = memo(
           />
 
           {/* Play Button Overlay */}
-          <motion.div
-            className="absolute inset-0 flex items-center justify-center"
-            initial={{ opacity: 0, scale: 0.8 }}
-            whileHover={
-              prefersReducedMotion ? undefined : { opacity: 1, scale: 1 }
-            }
-            transition={{ duration: 0.3, ease: "easeOut" }}
-          >
+          {pod.status === 'ready' ? (
             <motion.div
-              className="bg-white/95 backdrop-blur-sm rounded-full p-4 shadow-xl"
-              whileHover={prefersReducedMotion ? undefined : { scale: 1.1 }}
-              whileTap={prefersReducedMotion ? undefined : { scale: 0.9 }}
-              transition={{ duration: 0.2 }}
+              className="absolute inset-0 flex items-center justify-center"
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileHover={
+                prefersReducedMotion ? undefined : { opacity: 1, scale: 1 }
+              }
+              transition={{ duration: 0.3, ease: "easeOut" }}
             >
-              <Play className="w-8 h-8 text-blue-600 ml-1" />
+              <motion.div
+                className="bg-white/95 backdrop-blur-sm rounded-full p-4 shadow-xl"
+                whileHover={prefersReducedMotion ? undefined : { scale: 1.1 }}
+                whileTap={prefersReducedMotion ? undefined : { scale: 0.9 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Play className="w-8 h-8 text-blue-600 ml-1" />
+              </motion.div>
             </motion.div>
-          </motion.div>
+          ) : (
+            <motion.div
+              className="absolute inset-0 flex items-center justify-center"
+              initial={{ opacity: 0 }}
+              whileHover={
+                prefersReducedMotion ? undefined : { opacity: 1 }
+              }
+              transition={{ duration: 0.3, ease: "easeOut" }}
+            >
+              <motion.div
+                className="bg-black/80 backdrop-blur-sm rounded-lg px-4 py-2 shadow-xl"
+                whileHover={prefersReducedMotion ? undefined : { scale: 1.05 }}
+                transition={{ duration: 0.2 }}
+              >
+                <p className="text-white text-sm font-medium">
+                  {pod.status === 'processing' ? 'Processing...' : 'Not Ready'}
+                </p>
+              </motion.div>
+            </motion.div>
+          )}
 
           {/* Status Badge */}
           <motion.div
