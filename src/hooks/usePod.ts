@@ -44,7 +44,7 @@ export const getPodById = async (id: string): Promise<PodResponseData> => {
   }
 };
 
-export const createPod = async (title: string, video_urls: string[]): Promise<{
+export const createPod = async (title: string, video_urls: string[], description: string): Promise<{
   pod_id: string;
   title: string;
   status: string;
@@ -55,6 +55,7 @@ export const createPod = async (title: string, video_urls: string[]): Promise<{
       {
         title,
         video_urls,
+        description,
       },
       {
         headers: {

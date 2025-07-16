@@ -48,7 +48,7 @@ const CreatePodModal: React.FC<CreatePodModalProps> = ({ isOpen, onClose, onSubm
     
     try {
       const validUrls = formData.urls.filter(url => url.trim());
-      const result = await createPod(formData.title, validUrls);
+      const result = await createPod(formData.title, validUrls, formData.description);
       
       onSubmit({
         id: result.pod_id,
