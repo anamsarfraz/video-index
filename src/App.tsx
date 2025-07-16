@@ -172,27 +172,28 @@ const HomePage: React.FC = () => {
   };
 
   const handlePodSubmit = (formData: CreatePodFormData) => {
-  const handlePodSubmit = (podData: { id: string; title: string; status: string }) => {
-    const newPod: Pod = {
-      id: podData.id,
-      title: podData.title,
-      tags: ["Demo tags"],
-      image: "/default-pod-image.jpg", // Default image for new pods
-      queries: 0,
-      status: podData.status as 'ready' | 'processing',
-      //description: formData.description,
-      //thumbnail: `https://images.pexels.com/photos/${Math.floor(Math.random() * 1000000)}/pexels-photo-${Math.floor(Math.random() * 1000000)}.jpeg?auto=compress&cs=tinysrgb&w=400`,
-      //category: 'General',
-      //urls: formData.urls,
-      //createdAt: new Date(),
-      //interactions: 0,
-      //followers: Math.floor(Math.random() * 100),
-      //status: 'ready',
-      //isFollowing: false
-    };
+    const handlePodSubmit = (podData: { id: string; title: string; status: string }) => {
+      const newPod: Pod = {
+        id: podData.id,
+        title: podData.title,
+        tags: ["Demo tags"],
+        image: "/default-pod-image.jpg", // Default image for new pods
+        queries: 0,
+        status: podData.status as 'ready' | 'processing',
+        //description: formData.description,
+        //thumbnail: `https://images.pexels.com/photos/${Math.floor(Math.random() * 1000000)}/pexels-photo-${Math.floor(Math.random() * 1000000)}.jpeg?auto=compress&cs=tinysrgb&w=400`,
+        //category: 'General',
+        //urls: formData.urls,
+        //createdAt: new Date(),
+        //interactions: 0,
+        //followers: Math.floor(Math.random() * 100),
+        //status: 'ready',
+        //isFollowing: false
+      };
 
-    setPods((prev) => [newPod, ...prev]);
-    setShowHero(false); // Hide hero only after successful pod creation
+      setPods((prev) => [newPod, ...prev!]);
+      setShowHero(false); // Hide hero only after successful pod creation
+    };
   };
 
   const handlePodClick = (pod: Pod) => {
@@ -213,7 +214,7 @@ const HomePage: React.FC = () => {
   // Handle pod following
   const handleToggleFollow = (podId: string) => {
     setPods((prev) =>
-      prev.map((pod) =>
+      prev!.map((pod) =>
         pod.id === podId
           ? {
               ...pod,
