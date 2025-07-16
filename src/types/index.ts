@@ -4,6 +4,7 @@ export interface Pod {
   tags: string[];
   image: string;
   queries: number;
+  status?: 'ready' | 'processing';
   //description: string;
   //thumbnail: string;
   //category: string;

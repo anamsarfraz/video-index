@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Plus, Minus, AlertCircle } from 'lucide-react';
 import { CreatePodFormData } from '../types';
+import { createPod } from '../hooks/usePod';
 
 interface CreatePodModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: CreatePodFormData) => void;
+  onSubmit: (pod: { id: string; title: string; status: string }) => void;
 }
 
 const CreatePodModal: React.FC<CreatePodModalProps> = ({ isOpen, onClose, onSubmit }) => {
@@ -45,18 +46,26 @@ const CreatePodModal: React.FC<CreatePodModalProps> = ({ isOpen, onClose, onSubm
     
     setIsSubmitting(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    onSubmit({
-      ...formData,
-      urls: formData.urls.filter(url => url.trim())
-    });
-    
-    // Reset form
-    setFormData({ title: '', description: '', urls: [''] });
-    setErrors({});
-    setIsSubmitting(false);
+    try {
+      const validUrls = formData.urls.filter(url => url.trim());
+      const result = await createPod(formData.title, validUrls);
+      
+      onSubmit({
+        id: result.pod_id,
+        title: result.title,
+        status: result.status
+      });
+      
+      // Reset form
+      setFormData({ title: '', description: '', urls: [''] });
+      setErrors({});
+      onClose();
+    } catch (error) {
+      console.error('Failed to create pod:', error);
+      setErrors({ submit: 'Failed to create pod. Please try again.' });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const addUrlField = () => {
@@ -218,6 +227,12 @@ const CreatePodModal: React.FC<CreatePodModalProps> = ({ isOpen, onClose, onSubm
 
               {/* Actions */}
               <div className="flex gap-3">
+                {errors.submit && (
+                  <p className="w-full text-sm text-red-600 flex items-center mb-3">
+                    <AlertCircle className="w-4 h-4 mr-1" />
+                    {errors.submit}
+                  </p>
+                )}
                 <button
                   type="button"
                   onClick={onClose}

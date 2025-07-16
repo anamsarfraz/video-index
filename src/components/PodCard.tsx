@@ -43,6 +43,25 @@ const PodCard: React.FC<PodCardProps> = memo(
       });
     };
 
+    const getStatusConfig = (status?: Pod['status']) => {
+      switch (status) {
+        case 'ready':
+          return {
+            color: 'bg-green-500',
+            text: 'Ready'
+          };
+        case 'processing':
+          return {
+            color: 'bg-yellow-500',
+            text: 'Processing'
+          };
+        default:
+          return {
+            color: 'bg-green-500',
+            text: 'Ready'
+          };
+      }
+    };
     // const getStatusConfig = (status: Pod['status']) => {
     //   switch (status) {
     //     case 'ready':
@@ -199,17 +218,16 @@ const PodCard: React.FC<PodCardProps> = memo(
           </motion.div>
 
           {/* Status Badge */}
-          {/* <motion.div
-          className="absolute top-4 left-4"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: animationDelay + 0.2, duration: 0.4 }}
-        >
-          <div className={`flex items-center px-3 py-1 ${statusConfig.color} backdrop-blur-sm text-sm font-medium rounded-full shadow-lg`}>
-            <StatusIcon className="w-3 h-3 mr-1" />
-            {statusConfig.text}
-          </div>
-        </motion.div> */}
+          <motion.div
+            className="absolute top-4 left-4"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: animationDelay + 0.2, duration: 0.4 }}
+          >
+            <div className="flex items-center">
+              <div className={`w-3 h-3 ${getStatusConfig(pod.status).color} rounded-full shadow-lg`} />
+            </div>
+          </motion.div>
 
           {/* Follow Button */}
           <motion.div

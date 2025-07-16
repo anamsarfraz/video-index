@@ -172,12 +172,14 @@ const HomePage: React.FC = () => {
   };
 
   const handlePodSubmit = (formData: CreatePodFormData) => {
+  const handlePodSubmit = (podData: { id: string; title: string; status: string }) => {
     const newPod: Pod = {
-      id: Date.now().toString(),
-      title: formData.title,
+      id: podData.id,
+      title: podData.title,
       tags: ["Demo tags"],
-      image: "image_path",
+      image: "/default-pod-image.jpg", // Default image for new pods
       queries: 0,
+      status: podData.status as 'ready' | 'processing',
       //description: formData.description,
       //thumbnail: `https://images.pexels.com/photos/${Math.floor(Math.random() * 1000000)}/pexels-photo-${Math.floor(Math.random() * 1000000)}.jpeg?auto=compress&cs=tinysrgb&w=400`,
       //category: 'General',
@@ -191,7 +193,6 @@ const HomePage: React.FC = () => {
 
     setPods((prev) => [newPod, ...prev]);
     setShowHero(false); // Hide hero only after successful pod creation
-    closeCreateModal();
   };
 
   const handlePodClick = (pod: Pod) => {

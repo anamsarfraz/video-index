@@ -44,6 +44,37 @@ export const getPodById = async (id: string): Promise<PodResponseData> => {
   }
 };
 
+export const createPod = async (title: string, video_urls: string[]): Promise<{
+  pod_id: string;
+  title: string;
+  status: string;
+}> => {
+  try {
+    const response = await axios.post(
+      `${API_BASE_URL}/upload`,
+      {
+        title,
+        video_urls,
+      },
+      {
+        headers: {
+          "X-Session-Token": getUserSessionId(),
+        },
+      }
+    );
+    console.log("Pod created: ", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating pod:", error);
+    if (axios.isAxiosError(error)) {
+      throw new Error(
+        `Failed to create pod: ${error.response?.statusText || error.message}`
+      );
+    }
+    throw new Error("Failed to create pod");
+  }
+};
+
 export const queryPodStreaming = async (
   knowledge_base_id: string,
   query: string,
