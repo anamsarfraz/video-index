@@ -92,8 +92,6 @@ const SharedPodPage: React.FC = () => {
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const [pods, setPods] = useState<Pod[] | null>(null);
-  const [loadingPods, setLoadingPods] = useState(true);
-  const [podsFetchError, setPodsFetchError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterOption, setFilterOption] = useState("recent");
   const [showHero, setShowHero] = useState(true);
@@ -115,8 +113,6 @@ const HomePage: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoadingPods(true);
-        setPodsFetchError(null);
         const [podsData, usageResponse] = await Promise.all([
           getPods(),
           getUsage(),
@@ -138,10 +134,6 @@ const HomePage: React.FC = () => {
         setPods(mergedPods);
       } catch (error) {
         console.error("Error fetching data:", error);
-        setPodsFetchError("Failed to load pods. Please try again.");
-        setPods([]);
-      } finally {
-        setLoadingPods(false);
       }
     };
 
@@ -215,7 +207,7 @@ const HomePage: React.FC = () => {
   // Handle pod following
   const handleToggleFollow = (podId: string) => {
     setPods((prev) =>
-      prev ? prev.map((pod) =>
+      prev!.map((pod) =>
         pod.id === podId
           ? {
               ...pod,
@@ -223,7 +215,7 @@ const HomePage: React.FC = () => {
               //followers: pod.isFollowing ? pod.followers - 1 : pod.followers + 1
             }
           : pod
-      ) : []
+      )
     );
   };
 
@@ -239,41 +231,11 @@ const HomePage: React.FC = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const retryFetch = () => {
-    const fetchData = async () => {
-      try {
-        setLoadingPods(true);
-        setPodsFetchError(null);
-        const [podsData, usageResponse] = await Promise.all([
-          getPods(),
-          getUsage(),
-        ]);
+  // if (pods == null) {
+  //   return (
 
-        setUsageData(usageResponse);
-
-        // Merge query counts with pods
-        const mergedPods = podsData.map((pod) => {
-          const usageKey = `pod_${pod.id}`;
-          const queryCount = usageResponse[usageKey]?.queries || 0;
-
-          return {
-            ...pod,
-            queries: queryCount,
-          };
-        });
-
-        setPods(mergedPods);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setPodsFetchError("Failed to load pods. Please try again.");
-        setPods([]);
-      } finally {
-        setLoadingPods(false);
-      }
-    };
-
-    fetchData();
-  };
+  //   );
+  // }
 
   return (
     <>
@@ -301,7 +263,7 @@ const HomePage: React.FC = () => {
 
       {/* Pod Grid */}
 
-      {loadingPods ? (
+      {pods == null ? (
         <motion.div
           className="text-center py-20"
           initial={{ opacity: 0, scale: 0.9 }}
@@ -403,74 +365,6 @@ const HomePage: React.FC = () => {
               ))}
             </motion.div>
           )}
-        </motion.div>
-      ) : podsFetchError ? (
-        <motion.div
-          className="text-center py-20"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{
-            duration: prefersReducedMotion ? 0.2 : 0.6,
-            ease: "easeOut",
-          }}
-        >
-          <motion.div
-            className="w-32 h-32 bg-gradient-to-br from-red-100 to-pink-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg"
-          >
-            <svg
-              className="h-12 w-12 text-red-600"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
-              />
-            </svg>
-          </motion.div>
-
-          <motion.h3
-            className="text-2xl font-bold text-gray-700 mb-3"
-            initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              delay: prefersReducedMotion ? 0 : 0.2,
-              duration: prefersReducedMotion ? 0.2 : 0.5,
-            }}
-          >
-            Error Loading Pods
-          </motion.h3>
-
-          <motion.p
-            className="text-gray-500 text-lg mb-6"
-            initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              delay: prefersReducedMotion ? 0 : 0.4,
-              duration: prefersReducedMotion ? 0.2 : 0.5,
-            }}
-          >
-            {podsFetchError}
-          </motion.p>
-
-          <motion.button
-            onClick={retryFetch}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium"
-            initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              delay: prefersReducedMotion ? 0 : 0.6,
-              duration: prefersReducedMotion ? 0.2 : 0.5,
-            }}
-            whileHover={prefersReducedMotion ? undefined : { scale: 1.05 }}
-            whileTap={prefersReducedMotion ? undefined : { scale: 0.95 }}
-          >
-            Try Again
-          </motion.button>
         </motion.div>
       ) : (
         <PodGrid
