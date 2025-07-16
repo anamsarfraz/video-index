@@ -97,7 +97,10 @@ const PodCard: React.FC<PodCardProps> = memo(
 
     // Performance optimization: Memoize click handler
     const handleClick = React.useCallback(() => {
-      onClick(pod);
+      // Only allow clicking if pod is ready
+      if (pod.status === 'ready') {
+        onClick(pod);
+      }
     }, [onClick, pod]);
 
     // Handle follow toggle
@@ -155,7 +158,7 @@ const PodCard: React.FC<PodCardProps> = memo(
 
     return (
       <motion.div
-        className={`group cursor-pointer bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 ${
+        className={`group ${pod.status === 'ready' ? 'cursor-pointer' : 'cursor-not-allowed opacity-75'} bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 ${
           isClicked ? "z-50 relative" : ""
         }`}
         onClick={handleClick}
