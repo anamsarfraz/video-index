@@ -3,11 +3,11 @@ import { Pod, PodResponseData, QueryResponse } from "../types";
 import axios from "axios";
 import { getUserSessionId } from "../utils/cookieUtils";
 
-const API_BASE_URL = "/api";
+const API_BASE_URL = "https://api.videoindex.app";
 
 export const getPods = async (): Promise<Pod[]> => {
   const response = await axios.get<Pod[]>(
-    `${API_BASE_URL}/knowledge-bases`,
+    `https://api.videoindex.app/knowledge-bases`,
     {
       headers: {
         "X-Session-Token": getUserSessionId(),
