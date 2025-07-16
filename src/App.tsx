@@ -188,7 +188,6 @@ const HomePage: React.FC = () => {
       setPods((prev) => [newPod, ...prev!]);
       setShowHero(false); // Hide hero only after successful pod creation
     };
-  };
 
   const handlePodClick = (pod: Pod) => {
     navigate(`/pod/${pod.id}`);
